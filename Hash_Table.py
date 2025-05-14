@@ -4,7 +4,7 @@ Uses direct addressing for under 61 packages
 class Hash_Table:
     def __init__(self):
         #prime number larger than expected amount of packages
-        self.capacity = 61
+        self.capacity = 4
         #empty backing array
         self.map = [None]* self.capacity
         #length of backing array
@@ -53,30 +53,27 @@ class Hash_Table:
         self.new_capacity = self.capacity * 2
         # empty backing array
         self.new_map = [None] * self.capacity
+        #set new capacity for hashing function
+        old_capacity = self.capacity
+        self.capacity = self.new_capacity
 
         #copy from old array to new array
-        for index in enumerate(self.map):
+        for index in range(old_capacity):
             #copy only the existing data elements
             if self.map[index] is not None:
                 #if the current element contains a list of key value pairs
-                if isinstance(self.map[index], list):
-                    for key, value in self.map[index]:
-                        #add the key pair
-                        if self.new_map[index] is None:
-                            self.new_map[index] = list([key, value])
-                        else:
-                            self.new_map[index].append((key, value))
-
-                else:
-                    key, value = self.map[index]
-                    if self.new_map[index] is None:
-                        self.new_map[index] = [(key, value)]
+                for key, value in self.map[index]:
+                    #add the key pair as new list or append to existing list
+                    new_index = self._get_hash(key)
+                    if self.new_map[new_index] is None:
+                        self.new_map[new_index] = list([key, value])
                     else:
-                        self.new_map[index].append((key, value))
+                        self.new_map[new_index].append((key, value))
+
 
         #replace with larger array
         self.map = self.new_map
-        self.capacity = self.new_capacity
+
 
         #release temporary array
         self.new_map= None
