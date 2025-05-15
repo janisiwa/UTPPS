@@ -1,4 +1,9 @@
+import configparser
+
 import Hash_Table
+import os
+import configparser
+
 
 class Package:
 
@@ -10,7 +15,12 @@ class Package:
         if package_info_table.get(package_id):
             raise ValueError(f"Package with id {package_id} already exists")
 
-        #open package file
+        #get package data file location from application config file
+        config = configparser.ConfigParser()
+        config_file_path = os.path.join(os.getcwd(), 'app_config.ini')
+        config.read(config_file_path)
+        package_file_location = config.get('data_sources','package_file')
+
 
         #load in the package components
         self.street_address='195 W Oakland Ave'
