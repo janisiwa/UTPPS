@@ -25,6 +25,10 @@ class Package:
         self.co_delivery = ''
         self.new_address_needed = ''
         self.delivery_deadline_date='today'
+        self.delivery_status=''
+        self.delivery_time=''
+        self.delivery_date=''
+
 
 
     def __str__(self):

@@ -3,14 +3,14 @@ import configparser
 import csv
 import Package
 
-class PackageDataServices:
+class DataServices:
 
-    def get_package_data(self):
+    def get_data(self, file_type:str):
         # get package data file location from application config file
         config = configparser.ConfigParser()
         config_file_path = os.path.join(os.getcwd(), 'app_config.ini')
         config.read(config_file_path)
-        package_file_location = config.get('data_sources', 'package_file')
+        package_file_location = config.get('data_sources', file_type)
 
         # open the file
         data = open(package_file_location, encoding='utf-8-sig')
