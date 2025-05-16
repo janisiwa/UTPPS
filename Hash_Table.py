@@ -33,13 +33,13 @@ class Hash_Table:
             self.map[key_hash] = key_value
             self.size += 1
             return True
-        # else:
-        #     #update the value only
-        #     value_pair = self.map[key_hash]
-        #     if value_pair[0]==key_value:
-        #         value_pair[1]=key_value
-        #     self.size += 1
-        #     return True
+        else:
+            #update the value only
+            value_pair = self.map[key_hash]
+            if value_pair[0]==key:
+                value_pair[1]=value
+            self.size += 1
+            return True
 
 
 
@@ -80,7 +80,7 @@ class Hash_Table:
             return False
         else:
             # delete key pair
-            self.map[key_hash].pop()
+            self.map[key_hash]=None
             return True
 
     def get(self,key):

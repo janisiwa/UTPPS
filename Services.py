@@ -23,18 +23,22 @@ class PackageDataServices:
         for data_line in data_lines:
             # assign the unique id to the new package
             temp_id = int(data_line[0])
-            new_package = Package.Package(temp_id,package_info_table)
-            new_package.street_address = data_line[1]
-            new_package.city = data_line[2]
-            new_package.state = data_line[3]
-            new_package.zip_code = data_line[4]
-            new_package.delivery_deadline_time = data_line[5]
-            new_package.weight_kg = data_line[6]
-            new_package.special_notes = data_line[7]
-            new_package.delayed_delivery_time = data_line[8]
-            new_package.delivery_truck = data_line[9]
-            new_package.co_delivery = data_line[10]
-            new_package.new_address_needed = data_line[11]
+            try:
+                new_package = Package.Package(temp_id,package_info_table)
+                new_package.street_address = data_line[1]
+                new_package.city = data_line[2]
+                new_package.state = data_line[3]
+                new_package.zip_code = data_line[4]
+                new_package.delivery_deadline_time = data_line[5]
+                new_package.weight_kg = data_line[6]
+                new_package.special_notes = data_line[7]
+                new_package.delayed_delivery_time = data_line[8]
+                new_package.delivery_truck = data_line[9]
+                new_package.co_delivery = data_line[10]
+                new_package.new_address_needed = data_line[11]
 
-            # add pacakge to package info table
-            package_info_table.add(new_package.id, new_package)
+                # add pacakge to package info table
+                package_info_table.add(new_package.id, new_package)
+
+            except ValueError as e:
+                print(f"{e.args[0]} A new package was not created.")

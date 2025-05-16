@@ -9,11 +9,22 @@ class Package:
     def __init__(self, package_id:'int',package_info_table:'Hash_Table'):
         # check for duplicate unique id
         if package_info_table.get(package_id):
-            raise ValueError(f"Package with id {package_id} already exists")
+            raise ValueError(f"Package with ID {package_id} already exists.", package_id)
 
         self.id = package_id
-
-
+        
+        self.street_address = ''
+        self.city = ''
+        self.state = ''
+        self.zip_code = ''
+        self.delivery_deadline_time = ''
+        self.weight_kg = ''
+        self.special_notes = ''
+        self.delayed_delivery_time = ''
+        self.delivery_truck = ''
+        self.co_delivery = ''
+        self.new_address_needed = ''
+        self.delivery_deadline_date='today'
 
 
     def __str__(self):
