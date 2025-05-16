@@ -1,8 +1,4 @@
-﻿"Package
-ID",Address,City ,State,Zip,"Delivery
-Deadline","Weight
-KILO",Special Notes,Delayed Delivery Time,Delivery Truck,Co-Delivery,New Address Needed
-1,195 W Oakland Ave,Salt Lake City,UT,84115,10:30 AM,21,,,,,
+﻿1,195 W Oakland Ave,Salt Lake City,UT,84115,10:30 AM,21,,,,,
 2,2530 S 500 E,Salt Lake City,UT,84106,6:00 PM,44,,,,,
 3,233 Canyon Rd,Salt Lake City,UT,84103,6:00 PM,2,Can only be on truck 2,,Truck 2,,
 4,380 W 2880 S,Salt Lake City,UT,84115,6:00 PM,4,,,,,

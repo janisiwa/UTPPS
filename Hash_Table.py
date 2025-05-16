@@ -4,7 +4,7 @@ Uses direct addressing for under 61 packages
 class Hash_Table:
     def __init__(self):
         #prime number larger than expected amount of packages
-        self.capacity = 4
+        self.capacity = 61
         #empty backing array
         self.map = [None]* self.capacity
         #length of backing array
@@ -30,20 +30,16 @@ class Hash_Table:
 
         if self.map[key_hash] is None:
             #there are no existing keys in that index
-            self.map[key_hash] = list([key_value])
+            self.map[key_hash] = key_value
             self.size += 1
             return True
-        else:
-            #look through the list of existing key pairs
-            for value_pair in self.map[key_hash]:
-                if value_pair[0] == key:
-                    #the key is found, so update the value of the existing key pair
-                    value_pair[1]=value
-                    return True
-            #the key is not found, so add the new key pair to the list
-            self.map[key_hash].append(key_value)
-            self.size += 1
-            return True
+        # else:
+        #     #update the value only
+        #     value_pair = self.map[key_hash]
+        #     if value_pair[0]==key_value:
+        #         value_pair[1]=key_value
+        #     self.size += 1
+        #     return True
 
 
 
@@ -61,14 +57,10 @@ class Hash_Table:
         for index in range(old_capacity):
             #copy only the existing data elements
             if self.map[index] is not None:
-                #if the current element contains a list of key value pairs
-                for key, value in self.map[index]:
-                    #add the key pair as new list or append to existing list
-                    new_index = self._get_hash(key)
-                    if self.new_map[new_index] is None:
-                        self.new_map[new_index] = list([key, value])
-                    else:
-                        self.new_map[new_index].append((key, value))
+                value_pair= self.map[index]
+                new_index = self._get_hash(value_pair[0])
+                self.new_map[new_index] = value_pair
+
 
 
         #replace with larger array
@@ -87,11 +79,9 @@ class Hash_Table:
             # there are no existing keys in that index
             return False
         else:
-            # look through the list of existing key pairs
-            for index, value_pair in enumerate(self.map[key_hash]):
-                if self.map[key_hash][index][0]==key:
-                    self.map[key_hash].pop(index)
-                    return True
+            # delete key pair
+            self.map[key_hash].pop()
+            return True
 
     def get(self,key):
         # hash based on the input key
@@ -101,9 +91,7 @@ class Hash_Table:
             # there are no existing keys in that index
             return None
         else:
-            # look through the list of existing key pairs
-            for value_pair in self.map[key_hash]:
-                if value_pair[0] == key:
-                    # the key is found, so return it
-                    return value_pair[1]
+            # the key is found, so return it
+            value_pair = self.map[key_hash]
+            return value_pair[1]
 
