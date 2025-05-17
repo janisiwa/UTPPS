@@ -3,9 +3,18 @@ from Services import DataServices
 from Truck import Truck
 
 
-def load_trucks(truck_list, distance_list, address_list, package_info_table):
-    pass
+def load_trucks(data_service,truck_list, distance_list, address_list, package_info_table):
 
+    for i, truck in enumerate(truck_list):
+        truck_package_list = data_service.get_config_info('truck_info', 'packages_'+str(i)).split(',')
+        truck.packages_not_delivered=optimized_route(truck_package_list)
+
+        # mark packages as en route
+
+
+def optimized_route(truck_package_list):
+    #use nearest neighbor to reorder the packages
+    return truck_package_list
 
 def run_UTPPS():
     # store and retrieve package information
@@ -22,7 +31,7 @@ def run_UTPPS():
     #create the empty trucks
     truck_list = open_store_trucks(data_service)
 
-    load_trucks(truck_list,distance_list,address_list,package_info_table)  
+    load_trucks(data_service,truck_list,distance_list,address_list,package_info_table)
 
 
 def open_store_trucks(data_service):
@@ -38,6 +47,8 @@ def open_store_trucks(data_service):
         truck_list.append(truck)
     return truck_list
 
+def create_truck_package_list(truck:Truck):
+    truck_package_list = data_service.get_config_info('truck_info','packages_0').split(',')
 def open_store_packages(data_service:DataServices, package_info_table:Hash_Table):
    #load in the package file data
     package_data = data_service.get_data_file('package_file')

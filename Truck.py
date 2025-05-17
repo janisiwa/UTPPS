@@ -16,3 +16,6 @@ class Truck:
         self.trip_distance=None
         self.package_maximum=package_max
         self.route=None
+
+    def get_trucks_count(self):
+        return len(Truck.__truck_id)
