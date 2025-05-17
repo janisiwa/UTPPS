@@ -5,10 +5,11 @@ import Hash_Table
 
 
 class Package:
+    __package_ids=set()
 
-    def __init__(self, package_id:'int',package_info_table:'Hash_Table'):
+    def __init__(self, package_id:'int'):
         # check for duplicate unique id
-        if package_info_table.get(package_id):
+        if package_id in Package.__package_ids:
             raise ValueError(f"Package with ID {package_id} already exists.", package_id)
 
         self.id = package_id

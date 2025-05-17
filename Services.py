@@ -3,13 +3,23 @@ import configparser
 import csv
 import Package
 
+
+def read_config():
+    # get package data file location from application config file
+    config = configparser.ConfigParser()
+    config_file_path = os.path.join(os.getcwd(), 'app_config.ini')
+    config.read(config_file_path)
+    return config
+
+
 class DataServices:
 
-    def get_data(self, file_type:str):
-        # get package data file location from application config file
-        config = configparser.ConfigParser()
-        config_file_path = os.path.join(os.getcwd(), 'app_config.ini')
-        config.read(config_file_path)
+    def get_config_info(self, section: str, info_type: str):
+        config = read_config()
+        return config.get(section, info_type)
+
+    def get_data_file(self, file_type:str):
+        config = read_config()
         package_file_location = config.get('data_sources', file_type)
 
         # open the file
@@ -24,7 +34,7 @@ class DataServices:
             # assign the unique id to the new package
             temp_id = int(data_line[0])
             try:
-                new_package = Package.Package(temp_id,package_info_table)
+                new_package = Package.Package(temp_id)
                 new_package.street_address = data_line[1]
                 new_package.city = data_line[2]
                 new_package.state = data_line[3]
