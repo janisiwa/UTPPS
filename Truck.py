@@ -72,8 +72,11 @@ class Truck:
         # ensure unique id
         if truck_id in Truck.__truck_id:
             raise ValueError(f'Truck with ID {truck_id} already exists.', truck_id)
+        elif not type(truck_id) is int:
+            raise ValueError(f'Truck with ID {truck_id} is not an integer.', truck_id)
 
         self.id = truck_id
+        self.__truck_id.add(truck_id)
         self.driver=driver
         self.status='at hub'
         self.packages_not_delivered =None

@@ -74,7 +74,7 @@ class Package:
             raise ValueError(f'Package with ID {package_id} is not an integer.', package_id)
 
         self.id = package_id
-        
+        self.__package_ids.add(package_id)
         self.street_address = ''
         self.city = ''
         self.state = ''

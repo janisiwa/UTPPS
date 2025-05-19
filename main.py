@@ -24,10 +24,10 @@ def run_UTPPS():
     #place the packages into the trucks
     Truck.load_trucks(data_service,truck_list,distance_list,address_list,package_info_table)
 
-    #start deliveries 2 trucks at a time
+    #start deliveries
     for truck in truck_list:
         truck.deliver_packages()
-        print(f'Truck #:{truck.id} Total Distance: {truck.trip_distance} Return Time: {truck.return_time}')
+        print(f'Truck #:{truck.id} Total Distance: {truck.trip_distance:.2f} Return Time: {truck.return_time}')
 
 
 

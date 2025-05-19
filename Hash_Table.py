@@ -18,6 +18,7 @@ class Hash_Table:
         #hash function for future use if decided to no longer direct address
         return key % self.capacity
 
+    #insert function
     def add(self,key,value):
         # check for load capacity
         if self.size / self.capacity > 0.70:
