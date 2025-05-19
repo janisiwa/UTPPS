@@ -37,6 +37,16 @@ def open_store_trucks(data_service):
         package_max = int(package_max)
     driver_list = data_service.get_config_info('truck_info','truck_drivers_available').split(',')
 
+    #check for sufficient number of drivers
+    driver_shortage = int(number_of_trucks)-len(driver_list)
+    if driver_shortage > 0:
+        driver_available=0
+        for short_driver in range(driver_shortage):
+            driver_list.append(driver_list[driver_available])
+            if driver_available <len(driver_list)-1:
+                driver_available+=1
+            else:driver_available=0
+
     #create the trucks
     for i in range(number_of_trucks):
         truck=Truck(i+1,package_max,driver_list[i])

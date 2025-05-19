@@ -1,3 +1,4 @@
+#Janis Wint Student Number:012214215 WGU C950
 import Hash_Table
 from Services import DataServices
 import Truck
@@ -7,10 +8,7 @@ from datetime import datetime
 
 
 def run_UTPPS():
-    # store and retrieve package information
-
-
-    # helper to read files
+    # helper utility to read data files, calculate distances and convert datetimes
     data_service = DataServices()
 
     #at the beginning of the day, setup data
