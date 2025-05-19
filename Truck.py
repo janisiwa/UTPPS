@@ -1,12 +1,7 @@
 from Services import DataServices
 import Hash_Table
 
-def run_truck_deliveries(data_service,truck_list, distance_list, address_list, package_info_table:Hash_Table):
-
-    for i, truck in enumerate(truck_list):
-        truck.deliver_packages(data_service)
-
-def load_trucks(data_service,truck_list, distance_list, address_list, package_info_table):
+def load_trucks(data_service:DataServices,truck_list:list, distance_list:list, address_list:dict, package_info_table:Hash_Table):
 
     for i, truck in enumerate(truck_list):
         #when loading the first truck, set up the services for all trucks
@@ -84,7 +79,7 @@ class Truck:
         self.packages_not_delivered =None
         self.departure_time=None
         self.return_time=None
-        self.trip_distance=None
+        self.trip_distance=0
         self.package_maximum=package_max
         self.route=None
         self.clock=''
@@ -94,16 +89,42 @@ class Truck:
 
     def deliver_packages(self):
         #start the delivery clock
-        self.status='in route'
+        self.status='en route'
         self.clock=self.departure_time
 
-        #track the locations visited
-        self.route=list(self.packages_not_delivered)
-        #start at the hub
-        self.route[0]=0
-        index = 1
-        for package in self.packages_not_delivered:
-           pass
+        #mark all packages on route
+        for package_id in self.packages_not_delivered:
+            package = self.trucks_package_info_table.get(int(package_id))
+            package.delivery_status='en route'
+
+        #start at the hub, set current stop as address 0
+        current_stop=0
+        for package_id in self.packages_not_delivered:
+            package =self.trucks_package_info_table.get(int(package_id))
+            next_stop_address=package.get_address()
+            next_stop_list = self.trucks_address_list.get(next_stop_address)
+            next_stop= int(next_stop_list[0])
+            next_stop_distance = self.get_distance(current_stop, next_stop)
+            next_stop_time = self.trucks_data_service.next_stop_time(self.clock,next_stop_distance)
+
+            #update package
+            package.delivery_status='delivered'
+            package.delivery_datetime=next_stop_time
+
+            #update clock and distance for the truck
+            self.clock = next_stop_time
+            self.trip_distance+= next_stop_distance
+
+            #update deliver log
+
+            current_stop=next_stop
+
+        #return to hub
+        next_stop_distance = self.get_distance(current_stop, 0)
+        next_stop_time = self.trucks_data_service.next_stop_time(self.clock, next_stop_distance)
+        self.clock=next_stop_time
+        self.return_time=next_stop_time
+        self.status='at hub'
 
     def get_distance(self,x:int,y:int):
         #look up the distance between to locations
@@ -111,7 +132,7 @@ class Truck:
 
         #reverse the locations if the distance is not found
         if distance =='':
-            self.get_distance(y,x)
+            return self.get_distance(y,x)
         else:
             return float(distance)
 
@@ -123,6 +144,14 @@ class Truck:
         #check packages that are assigned to a specific truck
         for package_id in self.packages_not_delivered:
             package =self.trucks_package_info_table.get(int(package_id))
+
             if package.delivery_truck.isdigit():
                 if not package.delivery_truck == self.id:
                     raise ValueError(f'Package {package.id} is not assigned to Truck {self.id}.', package.delivery_truck)
+            else:
+                package.delivery_truck = self.id
+
+            if not package.delayed_delivery_time=='':
+                package.delivery_status="delayed"
+            else:
+                package.delivery_status = 'at hub'

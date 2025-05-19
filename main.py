@@ -26,7 +26,9 @@ def run_UTPPS():
 
     #start deliveries 2 trucks at a time
     for truck in truck_list:
-        print(f'Truck {truck.id}: packages:{truck.packages_not_delivered} \n departure time:{truck.departure_time}')
+        truck.deliver_packages()
+        print(f'Truck #:{truck.id} Total Distance: {truck.trip_distance} Return Time: {truck.return_time}')
+
 
 
 

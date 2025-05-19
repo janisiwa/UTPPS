@@ -52,6 +52,17 @@ def make_packages(data_service,data_lines,package_info_table:Hash_Table):
 
         return package_info_table
 
+#lookup function (by package id) to return package components
+def get_package(package_info_table:Hash_Table,package_id:int):
+    found_package=package_info_table.get(package_id)
+    if found_package is None:
+        return None
+    else:
+        return found_package
+
+
+
+
 class Package:
     __package_ids=set()
 
@@ -76,10 +87,12 @@ class Package:
         self.co_delivery = ''
         self.new_address_needed = ''
         self.delivery_status=''
-        self.delivery_time=''
-        self.delivery_date=''
+        self.delivery_datetime=None
+        self.delivery_deadline=None
 
-
+    def get_address(self):
+        address_zip=f'{self.street_address}|{self.zip_code}'
+        return address_zip
 
     def __str__(self):
-        return f'Package: {self.id} {self.weight_kg}\nDelivery Details: {self.street_address} {self.city}, {self.state}  {self.zip_code}   {self.delivery_deadline_time} {self.delivery_truck} \nSpecial Notes:  {self.special_notes} {self.delayed_delivery_time} {self.co_delivery}  {self.new_address_needed}'
+        return f'Package: {self.id} Weight: {self.weight_kg}kg Delivery Address: {self.street_address} {self.city}, {self.state} {self.zip_code}\nTruck #:{self.delivery_truck} Delivery Status: {self.delivery_status} {self.delivery_datetime}'
