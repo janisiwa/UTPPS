@@ -13,8 +13,8 @@ def load_trucks(data_service:DataServices,truck_list:list, distance_list:list, a
 
         # get the packages for that truck
         truck_package_list = data_service.get_config_info('truck_info', 'packages_'+str(i)).split(',')
-        #use an algorithm to determine the route order
-        truck.packages_not_delivered=optimized_route(truck_package_list)
+        #load onto the truck without optimization
+        truck.packages_not_delivered=truck_package_list
         #set the delivery starting time
         truck.departure_time=data_service.convert_str_datetime('',data_service.get_config_info('truck_info', 'start_delivery_'+str(i)))
         #check packages against constraints
@@ -22,7 +22,7 @@ def load_trucks(data_service:DataServices,truck_list:list, distance_list:list, a
 
 
 
-def optimized_route(truck_package_list):
+def optimize_route(truck_package_list):
     #use nearest neighbor to reorder the packages
     return truck_package_list
 
@@ -110,6 +110,19 @@ class Truck:
             package = self.trucks_package_info_table.get(int(package_id))
             package.delivery_status='en route'
             package.delivery_start_datetime=self.departure_time
+
+            if package.new_address_needed=='Yes':
+                if self.clock > self.trucks_data_service.convert_str_datetime('','10:20 AM'):
+                    #update address on package
+                    package.street_address='410 S State St'
+                    package.zip_code='84111'
+
+                    #update address in address table
+
+                    #update distance in distance table
+
+        #optimize the routing for efficient delivery
+        self.packages_not_delivered =optimize_route(self.packages_not_delivered)
 
         #start at the hub, set current stop as address 0
         current_stop=0

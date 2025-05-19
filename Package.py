@@ -96,4 +96,4 @@ class Package:
         return address_zip
 
     def __str__(self):
-        return f'Package: {self.id} Weight: {self.weight_kg}kg Delivery Address: {self.street_address} {self.city}, {self.state} {self.zip_code}\nTruck #:{self.delivery_truck} Delivery Status: {self.delivery_status} {self.delivery_datetime}'
+        return f'Package: {self.id} Weight: {self.weight_kg}kg Delivery Address: {self.street_address} {self.city}, {self.state} {self.zip_code}\nTruck #:{self.delivery_truck} Delivery Status: {self.delivery_status} {self.delivery_end_datetime}'
