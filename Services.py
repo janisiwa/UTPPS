@@ -1,7 +1,10 @@
 import os
 import configparser
 import csv
-import Package
+from tracemalloc import take_snapshot
+
+
+from datetime import datetime,date,timedelta
 
 
 def read_config():
@@ -28,27 +31,29 @@ class DataServices:
         data_lines = list(csv_reader)
         return data_lines
 
-    def make_packages(self, data_lines,package_info_table):
-        # load in the package components
-        for data_line in data_lines:
-            # assign the unique id to the new package
-            temp_id = int(data_line[0])
-            try:
-                new_package = Package.Package(temp_id)
-                new_package.street_address = data_line[1]
-                new_package.city = data_line[2]
-                new_package.state = data_line[3]
-                new_package.zip_code = data_line[4]
-                new_package.delivery_deadline_time = data_line[5]
-                new_package.weight_kg = data_line[6]
-                new_package.special_notes = data_line[7]
-                new_package.delayed_delivery_time = data_line[8]
-                new_package.delivery_truck = data_line[9]
-                new_package.co_delivery = data_line[10]
-                new_package.new_address_needed = data_line[11]
 
-                # add pacakge to package info table
-                package_info_table.add(new_package.id, new_package)
 
-            except ValueError as e:
-                print(f"{e.args[0]} A new package was not created.")
+    def convert_str_datetime(self,str_date:str='',str_time:str=''):
+        #if date not provided, use today's date
+        if str_date=='':
+            today = date.today()
+            str_date= f'{today.month}-{today.day}-{today.strftime('%Y')}'
+
+        #if time not provided, use 12 am
+        if str_time == '':
+            str_time= '12:00 AM'
+
+        str_datetime = f'{str_date} {str_time}'
+        return datetime.strptime(str_datetime, '%m-%d-%Y %I:%M %p')
+
+    def next_stop_time(self,start_time:datetime,distance:float):
+        #retrieve the speed in miles per hour
+        speed = float(DataServices.get_config_info(self,'truck_info','speed_mph').strip())
+
+        #distance/speed = how many hours it takes
+        travel_hours = distance/speed
+
+        #how many minutes it takes
+        travel_minutes = travel_hours*60
+
+        return start_time + timedelta(minutes=travel_minutes)
