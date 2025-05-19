@@ -87,7 +87,8 @@ class Package:
         self.co_delivery = ''
         self.new_address_needed = ''
         self.delivery_status=''
-        self.delivery_datetime=None
+        self.delivery_end_datetime=None
+        self.delivery_start_datetime = None
         self.delivery_deadline=None
 
     def get_address(self):

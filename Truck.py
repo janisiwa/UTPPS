@@ -109,6 +109,7 @@ class Truck:
         for package_id in self.packages_not_delivered:
             package = self.trucks_package_info_table.get(int(package_id))
             package.delivery_status='en route'
+            package.delivery_start_datetime=self.departure_time
 
         #start at the hub, set current stop as address 0
         current_stop=0
@@ -122,7 +123,7 @@ class Truck:
 
             #update package
             package.delivery_status='delivered'
-            package.delivery_datetime=next_stop_time
+            package.delivery_end_datetime=next_stop_time
 
             #update clock and distance for the truck
             self.clock = next_stop_time
