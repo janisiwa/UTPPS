@@ -25,14 +25,15 @@ def run_UTPPS():
     #start deliveries
     for truck in truck_list:
         truck.deliver_packages()
+
+    #run the UTTPS user interface
+    UTPPS_UI(truck_list,package_info_table)
+
+
+
+def UTPPS_UI(truck_list,package_info_table):
+    for truck in truck_list:
         print(f'Truck #:{truck.id} Total Distance: {truck.trip_distance:.2f} Start Time: {truck.departure_time} Return Time: {truck.return_time}')
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
