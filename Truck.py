@@ -1,5 +1,10 @@
+import math
+from datetime import timedelta
+
 from Services import DataServices
 import Hash_Table
+import re
+from datetime import datetime, timedelta
 
 def load_trucks(data_service:DataServices,truck_list:list, distance_list:list, address_list:dict, package_info_table:Hash_Table):
 
@@ -22,9 +27,7 @@ def load_trucks(data_service:DataServices,truck_list:list, distance_list:list, a
 
 
 
-def optimize_route(truck_package_list):
-    #use nearest neighbor to reorder the packages
-    return truck_package_list
+
 
 def open_store_trucks(data_service):
     truck_list = []
@@ -42,7 +45,7 @@ def open_store_trucks(data_service):
     if driver_shortage > 0:
         driver_available=0
         for short_driver in range(driver_shortage):
-            driver_list.append(driver_list[driver_available])
+            driver_list.append(f'{driver_list[driver_available]} - from Truck {driver_available+1}')
             if driver_available <len(driver_list)-1:
                 driver_available+=1
             else:driver_available=0
@@ -71,22 +74,24 @@ def open_store_addresses(data_service:DataServices):
 
 class Truck:
     #class level variable
-    __truck_id=set()
+    __truck_ids={}
+    __trucks_cumulative_distance=0
     trucks_data_service=None
     trucks_distance_list=None
     trucks_address_list=None
     trucks_package_info_table=None
 
 
+
     def __init__(self, truck_id:'int',package_max:'int',driver=''):
         # ensure unique id
-        if truck_id in Truck.__truck_id:
+        if truck_id in Truck.__truck_ids:
             raise ValueError(f'Truck with ID {truck_id} already exists.', truck_id)
         elif not type(truck_id) is int:
             raise ValueError(f'Truck with ID {truck_id} is not an integer.', truck_id)
 
         self.id = truck_id
-        self.__truck_id.add(truck_id)
+        self.__truck_ids.setdefault(int(truck_id), None)
         self.driver=driver
         self.status='at hub'
         self.packages_not_delivered =None
@@ -98,9 +103,18 @@ class Truck:
         self.clock=''
 
     def get_trucks_count(self):
-        return len(Truck.__truck_id)
+        return len(Truck.__truck_ids)
 
     def deliver_packages(self):
+        #delay delivery start time if waiting on a driver
+        if re.search(r'Truck',self.driver):
+            #get the truck number
+            delayed_truck_id = int(self.driver.split('Truck')[1].strip())
+
+            #set this truck to start delivering after the delayed truck ends its delivery
+            delayed_truck_return_time= self.__truck_ids.get(delayed_truck_id)
+            self.departure_time = timedelta(minutes=10) + delayed_truck_return_time
+
         #start the delivery clock
         self.status='en route'
         self.clock=self.departure_time
@@ -112,7 +126,7 @@ class Truck:
             package.delivery_start_datetime=self.departure_time
 
             if package.new_address_needed=='Yes':
-                if self.clock > self.trucks_data_service.convert_str_datetime('','10:20 AM'):
+                if self.clock > self.trucks_data_service.convert_str_datetime('', '10:20 AM'):
                     #update address on package
                     package.street_address='410 S State St'
                     package.zip_code='84111'
@@ -122,7 +136,7 @@ class Truck:
                     #update distance in distance table
 
         #optimize the routing for efficient delivery
-        self.packages_not_delivered =optimize_route(self.packages_not_delivered)
+        self.packages_not_delivered =self.optimize_route(self.packages_not_delivered)
 
         #start at the hub, set current stop as address 0
         current_stop=0
@@ -132,7 +146,7 @@ class Truck:
             next_stop_list = self.trucks_address_list.get(next_stop_address)
             next_stop= int(next_stop_list[0])
             next_stop_distance = self.get_distance(current_stop, next_stop)
-            next_stop_time = self.trucks_data_service.next_stop_time(self.clock,next_stop_distance)
+            next_stop_time = self.trucks_data_service.next_stop_time(self.clock, next_stop_distance)
 
             #update package
             package.delivery_status='delivered'
@@ -142,7 +156,8 @@ class Truck:
             self.clock = next_stop_time
             self.trip_distance+= next_stop_distance
 
-            #update deliver log
+            #update cumulative distance for all trucks
+            self.__trucks_cumulative_distance += next_stop_distance
 
             current_stop=next_stop
 
@@ -151,6 +166,7 @@ class Truck:
         next_stop_time = self.trucks_data_service.next_stop_time(self.clock, next_stop_distance)
         self.clock=next_stop_time
         self.return_time=next_stop_time
+        Truck.__truck_ids[self.id]=self.return_time
         self.status='at hub'
 
     def get_distance(self,x:int,y:int):
@@ -182,3 +198,41 @@ class Truck:
                 package.delivery_status="delayed"
             else:
                 package.delivery_status = 'at hub'
+
+    def optimize_route(self, not_visited_package_list:list):
+        # use nearest neighbor to reorder the packages
+
+        # order of addresses to be visited, using address index number
+        visited_list = []
+        # start at the hub
+        last_address_node = 0
+
+        while not_visited_package_list:
+            next_package = None
+            next_remove_index=0
+            shortest_distance = math.inf
+
+            # get most recent address visited
+            at_address = last_address_node
+
+            #check for the closest address to the most recent address
+            for index_remove,package_id in enumerate(not_visited_package_list):
+                package = self.trucks_package_info_table.get(int(package_id))
+                zip_address = package.get_address()
+                address = self.trucks_address_list.get(zip_address)
+                address = int(address[0])
+                address_distance = self.get_distance(int(at_address), int(address))
+                if address_distance<shortest_distance:
+                    shortest_distance = address_distance
+                    next_package = package_id
+                    next_remove_index = index_remove
+                    last_address_node = address
+
+            #save the closest address to the visited set
+            visited_list.append(next_package)
+            not_visited_package_list.pop(next_remove_index)
+
+        return visited_list
+
+    def get_cumulative_distance(self):
+        return self.__trucks_cumulative_distance
