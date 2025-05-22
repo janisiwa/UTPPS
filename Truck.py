@@ -96,12 +96,13 @@ class Truck:
         self.driver=driver
         self.status='at hub'
         self.packages_not_delivered =None
-        self.departure_time=None
-        self.return_time=None
+        self.departure_time=timedelta(0)
+        self.return_time=timedelta(0)
         self.trip_distance=0
         self.package_maximum=package_max
         self.route=None
-        self.clock=''
+        self.clock=timedelta(0)
+        self.total_delivery_time=timedelta(0)
 
     def get_trucks_count(self):
         return len(Truck._truck_ids)
@@ -132,9 +133,6 @@ class Truck:
                     package.street_address='410 S State St'
                     package.zip_code='84111'
 
-                    #update address in address table
-
-                    #update distance in distance table
 
         #optimize the routing for efficient delivery
         self.packages_not_delivered =self.optimize_route(self.packages_not_delivered)
@@ -166,9 +164,11 @@ class Truck:
         next_stop_distance = self.get_distance(current_stop, 0)
         next_stop_time = self.trucks_data_service.next_stop_time(self.clock, next_stop_distance)
         self.clock=next_stop_time
+
         self.return_time=next_stop_time
         Truck._truck_ids[self.id]=self.return_time
-        Truck._trucks_total_time += self.return_time - self.departure_time
+        self.total_delivery_time= self.return_time - self.departure_time
+        Truck._trucks_total_time += self.total_delivery_time
         self.status='at hub'
 
     def get_distance(self,x:int,y:int):

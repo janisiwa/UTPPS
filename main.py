@@ -34,9 +34,11 @@ def print_line():
     #decorative line for spacing in the UI
     print('-'*220)
 
+def print_new_section():
+    print('\n\n')
+
 def create_menu():
     #display options to the user in the command line interface
-    print_line()
     print(f'{'Utah Private Parcel Service (UTPPS)':^220}\n\n')
     print('Delivery Status Options:')
     print('1. View a package status using package id')
@@ -53,13 +55,20 @@ def package_status_all():
     print('All packages')
 
 def total_miles_travelled(truck_list):
+    #display individual truck delivery miles and time
+    print_line()
+    print(f'{'Truck Delivery Summary':^220}')
+    print_line()
     for truck in truck_list:
-        print(
-            f'Truck #:{truck.id} Total Distance: {truck.trip_distance:.2f} Start Time: {truck.departure_time} Return Time: {truck.return_time}')
+        print(f'Truck #:{truck.id}{' ':<15}Total Distance: {truck.trip_distance:.2f}{' ':<15}Start Time: {truck.departure_time}{' ':<15}Return Time: {truck.return_time}{' ':<15}Delivery Time: {truck.total_delivery_time}')
+        print_line()
 
-    print(f'\nTotal Miles Travelled: {truck_list[-1].get_cumulative_distance()}')
+    #display cumulative miles and time
+    print_line()
+    print(f'Total Miles Travelled: {truck_list[-1].get_cumulative_distance()}')
     print(f'Total Delivery Time: {truck_list[-1].get_total_time()}')
     print(f'Last Delivery: {truck_list[-1].return_time}')
+    print_new_section()
 
 def exit_program():
     print_line()
