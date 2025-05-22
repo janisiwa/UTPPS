@@ -38,13 +38,13 @@ def create_menu():
     #display options to the user in the command line interface
     print_line()
     print(f'{'Utah Private Parcel Service (UTPPS)':^220}\n\n')
-    print("Delivery Status Options:")
-    print("1. View a package status using package id")
-    print("2. View status of all packages")
-    print("3. View total miles travelled for all trucks")
-    print("4. Exit")
-    print("Select [1-4]:")
-    print_line()
+    print('Delivery Status Options:')
+    print('1. View a package status using package id')
+    print('2. View status of all packages')
+    print('3. View total miles travelled for all trucks')
+    print('4. Exit')
+    print('Select [1-4]: ')
+
 
 def package_status_by_id():
     print('One package')
@@ -56,6 +56,10 @@ def total_miles_travelled(truck_list):
     for truck in truck_list:
         print(
             f'Truck #:{truck.id} Total Distance: {truck.trip_distance:.2f} Start Time: {truck.departure_time} Return Time: {truck.return_time}')
+
+    print(f'\nTotal Miles Travelled: {truck_list[-1].get_cumulative_distance()}')
+    print(f'Total Delivery Time: {truck_list[-1].get_total_time()}')
+    print(f'Last Delivery: {truck_list[-1].return_time}')
 
 def exit_program():
     print_line()

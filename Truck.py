@@ -74,8 +74,9 @@ def open_store_addresses(data_service:DataServices):
 
 class Truck:
     #class level variable
-    __truck_ids={}
-    __trucks_cumulative_distance=0
+    _truck_ids={}
+    _trucks_cumulative_distance=0
+    _trucks_total_time=timedelta(0)
     trucks_data_service=None
     trucks_distance_list=None
     trucks_address_list=None
@@ -85,13 +86,13 @@ class Truck:
 
     def __init__(self, truck_id:'int',package_max:'int',driver=''):
         # ensure unique id
-        if truck_id in Truck.__truck_ids:
+        if truck_id in Truck._truck_ids:
             raise ValueError(f'Truck with ID {truck_id} already exists.', truck_id)
         elif not type(truck_id) is int:
             raise ValueError(f'Truck with ID {truck_id} is not an integer.', truck_id)
 
         self.id = truck_id
-        self.__truck_ids.setdefault(int(truck_id), None)
+        Truck._truck_ids.setdefault(int(truck_id), None)
         self.driver=driver
         self.status='at hub'
         self.packages_not_delivered =None
@@ -103,7 +104,7 @@ class Truck:
         self.clock=''
 
     def get_trucks_count(self):
-        return len(Truck.__truck_ids)
+        return len(Truck._truck_ids)
 
     def deliver_packages(self):
         #delay delivery start time if waiting on a driver
@@ -112,7 +113,7 @@ class Truck:
             delayed_truck_id = int(self.driver.split('Truck')[1].strip())
 
             #set this truck to start delivering after the delayed truck ends its delivery
-            delayed_truck_return_time= self.__truck_ids.get(delayed_truck_id)
+            delayed_truck_return_time= Truck._truck_ids.get(delayed_truck_id)
             self.departure_time = timedelta(minutes=10) + delayed_truck_return_time
 
         #start the delivery clock
@@ -157,7 +158,7 @@ class Truck:
             self.trip_distance+= next_stop_distance
 
             #update cumulative distance for all trucks
-            self.__trucks_cumulative_distance += next_stop_distance
+            Truck._trucks_cumulative_distance += next_stop_distance
 
             current_stop=next_stop
 
@@ -166,7 +167,8 @@ class Truck:
         next_stop_time = self.trucks_data_service.next_stop_time(self.clock, next_stop_distance)
         self.clock=next_stop_time
         self.return_time=next_stop_time
-        Truck.__truck_ids[self.id]=self.return_time
+        Truck._truck_ids[self.id]=self.return_time
+        Truck._trucks_total_time += self.return_time - self.departure_time
         self.status='at hub'
 
     def get_distance(self,x:int,y:int):
@@ -235,4 +237,7 @@ class Truck:
         return visited_list
 
     def get_cumulative_distance(self):
-        return self.__trucks_cumulative_distance
+        return Truck._trucks_cumulative_distance
+
+    def get_total_time(self):
+        return Truck._trucks_total_time
