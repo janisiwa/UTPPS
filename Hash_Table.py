@@ -96,3 +96,9 @@ class Hash_Table:
             value_pair = self.map[key_hash]
             return value_pair[1]
 
+    def get_all(self):
+        return_list =[]
+        for entry in self.map:
+            if entry:
+                return_list.append(entry[1])
+        return return_list

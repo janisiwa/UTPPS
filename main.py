@@ -48,16 +48,38 @@ def create_menu():
     print('Select [1-4]: ')
 
 
-def package_status_by_id():
-    print('One package')
+def print_package(package:Package):
+    print('package')
 
-def package_status_all():
-    print('All packages')
+def get_package_status(package:Package):
+    print_line()
+    print(package)
+    print_line()
+
+
+def package_status_all(package_info_table:Hash_Table, package_id=0):
+    print_line()
+    package_list=None
+
+    #get all packages
+    if package_id==0:
+        print(f'{'UTPPS Package Delivery Summary - All Packages':^220}')
+        package_list=package_info_table.get_all()
+    #get a specific package
+    else:
+        summary_title = f'UTPPS Package Delivery Summary for Package ID {package_id}'
+        print(f'{summary_title:^220}')
+        package_list = [package_info_table.get(package_id)]
+
+    for package in package_list:
+        get_package_status(package)
+
+
 
 def total_miles_travelled(truck_list):
     #display individual truck delivery miles and time
     print_line()
-    print(f'{'Truck Delivery Summary':^220}')
+    print(f'{'UTPPS Truck Delivery Summary':^220}')
     print_line()
     for truck in truck_list:
         print(f'Truck #:{truck.id}{' ':<15}Total Distance: {truck.trip_distance:.2f}{' ':<15}Start Time: {truck.departure_time}{' ':<15}Return Time: {truck.return_time}{' ':<15}Delivery Time: {truck.total_delivery_time}')
@@ -85,10 +107,14 @@ def UTPPS_UI(truck_list,package_info_table):
 
         match menu_choice.strip():
             case "1":
-                package_status_by_id()
-
+                package_status_all(package_info_table,2)
+                print_new_section()
             case "2":
-                package_status_all()
+                package_status_all(package_info_table)
+                # display cumulative all package summary
+                print_line()
+                print(f'Total Packages Delivered: {package_info_table.size}')
+                print_new_section()
 
             case "3":
                 total_miles_travelled(truck_list)
