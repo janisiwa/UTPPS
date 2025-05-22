@@ -1,5 +1,7 @@
 import configparser
 import csv
+from datetime import datetime, timedelta
+
 import Services
 import Hash_Table
 from Services import DataServices
@@ -95,5 +97,12 @@ class Package:
         address_zip=f'{self.street_address}|{self.zip_code}'
         return address_zip
 
+    def print_status(self, time:datetime):
+        status_at_time='delivered'
+        address_at_time='410'
+        zip_at_time = '33333'
+        delivery_endtime_at_time = timedelta(0)
+
+        return f'Package: {self.id} Weight: {self.weight_kg}kg Delivery Address: {address_at_time} {self.city}, {self.state} {zip_at_time}\nTruck #:{self.delivery_truck} Delivery Status: {status_at_time} {delivery_endtime_at_time}'
     def __str__(self):
         return f'Package: {self.id} Weight: {self.weight_kg}kg Delivery Address: {self.street_address} {self.city}, {self.state} {self.zip_code}\nTruck #:{self.delivery_truck} Delivery Status: {self.delivery_status} {self.delivery_end_datetime}'

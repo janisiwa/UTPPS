@@ -4,7 +4,7 @@ from Services import DataServices
 import Truck
 import Package
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def run_UTPPS():
@@ -48,16 +48,14 @@ def create_menu():
     print('Select [1-4]: ')
 
 
-def print_package(package:Package):
-    print('package')
 
-def get_package_status(package:Package):
+def get_package_status(package:Package, time:datetime):
     print_line()
-    print(package)
+    print(package.print_status(time))
     print_line()
 
 
-def package_status_all(package_info_table:Hash_Table, package_id=0):
+def package_status_all(package_info_table:Hash_Table, package_id=0, time:datetime=timedelta(0)):
     print_line()
     package_list=None
 
@@ -72,7 +70,7 @@ def package_status_all(package_info_table:Hash_Table, package_id=0):
         package_list = [package_info_table.get(package_id)]
 
     for package in package_list:
-        get_package_status(package)
+        get_package_status(package,time)
 
 
 
