@@ -1,5 +1,5 @@
 import math
-from datetime import timedelta
+import Services
 
 from Services import DataServices
 import Hash_Table
@@ -71,6 +71,22 @@ def open_store_addresses(data_service:DataServices):
     # will use .get method to get position of the address within the distance data list
     address_data = {address_zip: values for address_zip, *values in address_data_lines}
     return address_data
+
+def total_miles_travelled(truck_list):
+    #display individual truck delivery miles and time
+    Services.print_line()
+    print(f'{'UTPPS Truck Delivery Summary':^220}')
+    Services.print_line()
+    for truck in truck_list:
+        print(f'Truck #:{truck.id}{' ':<15}Total Distance: {truck.trip_distance:.2f}{' ':<15}Start Time: {truck.departure_time}{' ':<15}Return Time: {truck.return_time}{' ':<15}Delivery Time: {truck.total_delivery_time}')
+        Services.print_line()
+
+    #display cumulative miles and time
+    Services.print_line()
+    print(f'Total Miles Travelled: {truck_list[-1].get_cumulative_distance()}')
+    print(f'Total Delivery Time: {truck_list[-1].get_total_time()}')
+    print(f'Last Delivery: {truck_list[-1].return_time}')
+    Services.print_new_section()
 
 class Truck:
     #class level variable

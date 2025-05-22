@@ -64,6 +64,26 @@ def get_package(package_info_table:Hash_Table,package_id:int):
 
 
 
+def package_status_all(package_info_table:Hash_Table, package_id=0, time:datetime=timedelta(0)):
+    Services.print_line()
+    package_list=None
+
+    #get all packages
+    if package_id==0:
+        print(f'{'UTPPS Package Delivery Summary - All Packages':^220}')
+        package_list=package_info_table.get_all()
+    #get a specific package
+    else:
+        summary_title = f'UTPPS Package Delivery Summary for Package ID {package_id}'
+        print(f'{summary_title:^220}')
+        package_list = [package_info_table.get(package_id)]
+
+    for package in package_list:
+        Services.print_line()
+        print(package.print_status(time))
+        Services.print_line()
+
+
 
 class Package:
     __package_ids=set()

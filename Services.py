@@ -14,6 +14,12 @@ def read_config():
     config.read(config_file_path)
     return config
 
+def print_line():
+    #decorative line for spacing in the UI
+    print('-'*220)
+
+def print_new_section():
+    print('\n\n')
 
 class DataServices:
 
