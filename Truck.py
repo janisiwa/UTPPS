@@ -236,8 +236,10 @@ class Truck:
 
         return visited_list
 
-    def get_cumulative_distance(self):
+    @classmethod
+    def get_cumulative_distance(cls):
         return Truck._trucks_cumulative_distance
 
-    def get_total_time(self):
+    @classmethod
+    def get_total_time(cls):
         return Truck._trucks_total_time
