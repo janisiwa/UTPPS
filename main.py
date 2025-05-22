@@ -26,14 +26,64 @@ def run_UTPPS():
     for truck in truck_list:
         truck.deliver_packages()
 
-    #run the UTTPS user interface
+    #run the UTPPS user interface
     UTPPS_UI(truck_list,package_info_table)
 
 
+def print_line():
+    #decorative line for spacing in the UI
+    print('-'*220)
+
+def create_menu():
+    #display options to the user in the command line interface
+    print_line()
+    print(f'{'Utah Private Parcel Service (UTPPS)':^220}\n\n')
+    print("Delivery Status Options:")
+    print("1. View a package status using package id")
+    print("2. View status of all packages")
+    print("3. View total miles travelled for all trucks")
+    print("4. Exit")
+    print("Select [1-4]:")
+    print_line()
+
+def package_status_by_id():
+    print('One package')
+
+def package_status_all():
+    print('All packages')
+
+def total_miles_travelled(truck_list):
+    for truck in truck_list:
+        print(
+            f'Truck #:{truck.id} Total Distance: {truck.trip_distance:.2f} Start Time: {truck.departure_time} Return Time: {truck.return_time}')
+
+def exit_program():
+    print_line()
+    print('Exiting the UTPPS System! Bye!')
+    print_line()
 
 def UTPPS_UI(truck_list,package_info_table):
-    for truck in truck_list:
-        print(f'Truck #:{truck.id} Total Distance: {truck.trip_distance:.2f} Start Time: {truck.departure_time} Return Time: {truck.return_time}')
+
+
+    menu_choice = ""
+    while menu_choice != "4":
+        create_menu()
+        menu_choice = input("").strip()
+
+        match menu_choice.strip():
+            case "1":
+                package_status_by_id()
+
+            case "2":
+                package_status_all()
+
+            case "3":
+                total_miles_travelled(truck_list)
+            case "4":
+                exit_program()
+            case _:
+                print("Error - Enter a valid menu choice 1-4")
+
 
 
 if __name__ == '__main__':
