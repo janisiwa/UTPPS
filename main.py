@@ -6,7 +6,20 @@ import Services
 
 from datetime import datetime, timedelta
 
-def read_required_string_as_time(prompt:str,usingtime:bool=False):
+def read_required_string_as_time(prompt: str, usingtime: bool = False):
+    """Prompts the user for a required input string and converts it to a time or integer.
+
+    Recursively asks the user until valid input is provided or user cancels with 'q'.
+
+    Args:
+        prompt (str): The message displayed to the user.
+        usingtime (bool, optional): If True, input is expected to be a time string;
+            if False, input is expected to be an integer package ID. Defaults to False.
+
+    Returns:
+        datetime.datetime or int or bool: Returns a datetime object if usingtime is True,
+            an integer if usingtime is False, or False if the user cancels input with 'q'.
+    """
     #verify the input is not empty
     input_string = input(prompt)
     if input_string.strip() =='':
@@ -36,7 +49,11 @@ def read_required_string_as_time(prompt:str,usingtime:bool=False):
 
 
 def run_UTPPS():
+    """Runs the main Utah Private Parcel Service (UTPPS) program workflow.
 
+    Initializes data, loads trucks with packages, delivers packages,
+    and starts the user interface.
+    """
     #at the beginning of the day, setup data
     package_info_table =Package.open_store_packages()
     distance_list = Truck.open_store_distances()
@@ -59,8 +76,9 @@ def run_UTPPS():
 
 
 def create_menu():
+    """Displays the command line menu options for the UTPPS system."""
     #display options to the user in the command line interface
-    print(f'{'--- Utah Private Parcel Service (UTPPS) ---':^220}')
+    print(f'{"--- Utah Private Parcel Service (UTPPS) ---":^220}')
     print('Delivery Status Options:')
     print('1. View a package status using package id')
     print('2. View status of all packages')
@@ -72,16 +90,19 @@ def create_menu():
 
 
 
-
-
 def exit_program():
-    Services. print_line()
+    """Prints a message indicating the program is exiting."""
+    Services.print_line()
     print('Exiting the UTPPS System! Bye!')
     Services.print_line()
 
-def UTPPS_UI(truck_list,package_info_table):
+def UTPPS_UI(truck_list, package_info_table):
+    """Runs the UTPPS command line user interface for package and delivery status queries.
 
-
+    Args:
+        truck_list (list): List of Truck objects representing delivery trucks.
+        package_info_table (Hash_Table): Hash_Table storing package information.
+    """
     menu_choice = ''
     while menu_choice != '4':
         create_menu()

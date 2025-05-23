@@ -1,13 +1,23 @@
 import math
 import Services
 
-
 import Hash_Table
 import re
 from datetime import datetime, timedelta
 
 def load_trucks(truck_list:list, distance_list:list, address_list:dict, package_info_table:Hash_Table):
+    """
+    Initialize and load trucks with packages, distance data, address data, and package information.
 
+    Args:
+        truck_list (list): List of Truck objects to be loaded.
+        distance_list (list): Distance matrix used by trucks.
+        address_list (dict): Dictionary of address data keyed by address|zip.
+        package_info_table (Hash_Table): Hash_Table containing package information.
+
+    Returns:
+        None
+    """
     for i, truck in enumerate(truck_list):
         #when loading the first truck, set up the services for all trucks
         if truck.trucks_data_service is None:
@@ -24,11 +34,16 @@ def load_trucks(truck_list:list, distance_list:list, address_list:dict, package_
         #check packages against constraints
         truck.validate_packages()
 
-
-
-
-
 def open_store_trucks():
+    """
+    Create and return a list of Truck objects based on configuration.
+
+    Reads configuration to determine the number of trucks, maximum packages per truck,
+    and assigns drivers, including handling driver shortages by reassigning drivers.
+
+    Returns:
+        list: A list of initialized Truck objects.
+    """
     truck_list = []
     #read in the truck information from the config file
     number_of_trucks = Services.get_config_info('truck_info','trucks_available').strip()
@@ -55,14 +70,26 @@ def open_store_trucks():
         truck_list.append(truck)
     return truck_list
 
-
-
 def open_store_distances():
+    """
+    Load and return distance data from the configured distance file.
+
+    Returns:
+        list: A list containing rows of distance data.
+    """
     # load in distance data from file
     distance_data = list(Services.get_data_file('distance_file'))
     return distance_data
 
 def open_store_addresses():
+    """
+    Load and return address data as a dictionary from the configured address file.
+
+    The dictionary keys are address|zip codes, and values are associated data fields.
+
+    Returns:
+        dict: Dictionary mapping address|zip keys to corresponding address data values.
+    """
     # load in address data from file
     address_data_lines = list(Services.get_data_file('address_file'))
 
@@ -72,22 +99,58 @@ def open_store_addresses():
     return address_data
 
 def total_miles_travelled(truck_list):
+    """
+    Print a delivery summary including individual truck distances and times,
+    as well as cumulative totals for miles travelled and delivery time.
+
+    Args:
+        truck_list (list): List of Truck objects to summarize.
+
+    Returns:
+        None
+    """
     #display individual truck delivery miles and time
     Services.print_line()
-    print(f'{'UTPPS Truck Delivery Summary':^220}')
+    print(f'{"UTPPS Truck Delivery Summary":^220}')
     Services.print_line()
     for truck in truck_list:
-        print(f'Truck #:{truck.id}{' ':<15}Total Distance: {truck.trip_distance:.2g} mi{' ':<15}Start Time: {truck.departure_time.strftime('%m-%d-%Y %I:%M %p')}{' ':<15}Return Time: {truck.return_time.strftime('%m-%d-%Y %I:%M %p')}{' ':<15}Delivery Duration: {truck.total_delivery_time}')
+        print(f'Truck #:{truck.id}{" ":<15}Total Distance: {truck.trip_distance:.2g} mi{" ":<15}Start Time: {truck.departure_time.strftime("%m-%d-%Y %I:%M %p")}{" ":<15}Return Time: {truck.return_time.strftime("%m-%d-%Y %I:%M %p")}{" ":<15}Delivery Duration: {truck.total_delivery_time}')
         Services.print_line()
 
     #display cumulative miles and time
     Services.print_line()
     print(f'Total Miles Travelled: {truck_list[-1].get_cumulative_distance():2g} mi')
     print(f'Total Delivery Time: {truck_list[-1].get_total_time()}')
-    print(f'Last Delivery: {truck_list[-1].return_time.strftime('%m-%d-%Y %I:%M %p')}')
+    print(f'Last Delivery: {truck_list[-1].return_time.strftime("%m-%d-%Y %I:%M %p")}')
     Services.print_new_section()
 
 class Truck:
+    """
+    Represents a delivery truck with packages, routes, and associated delivery information.
+
+    Class Attributes:
+        _truck_ids (dict): Tracks existing truck IDs and their return times.
+        _trucks_cumulative_distance (float): Cumulative distance travelled by all trucks.
+        _trucks_total_time (timedelta): Total delivery time for all trucks.
+        trucks_data_service (NoneType): Placeholder for shared service data.
+        trucks_distance_list (list): Shared distance matrix for trucks.
+        trucks_address_list (dict): Shared address data for trucks.
+        trucks_package_info_table (Hash_Table): Shared package info Hash_Table.
+
+    Instance Attributes:
+        id (int): Unique truck identifier.
+        driver (str): Name or identifier of the driver.
+        status (str): Current status of the truck (e.g., 'At hub', 'En route').
+        packages_not_delivered (list): List of package IDs currently loaded on truck.
+        departure_time (datetime): Start time of the truck's delivery route.
+        return_time (datetime): Time truck returns to the hub.
+        trip_distance (float): Total distance travelled by this truck.
+        package_maximum (int): Maximum number of packages the truck can carry.
+        route (list): Optimized delivery route.
+        clock (datetime or timedelta): Current time tracker during delivery.
+        total_delivery_time (timedelta): Duration of this truck's delivery route.
+    """
+
     #class level variable
     _truck_ids={}
     _trucks_cumulative_distance=0
@@ -97,9 +160,18 @@ class Truck:
     trucks_address_list=None
     trucks_package_info_table=None
 
-
-
     def __init__(self, truck_id:'int',package_max:'int',driver=''):
+        """
+        Initialize a Truck instance.
+
+        Args:
+            truck_id (int): Unique identifier for the truck.
+            package_max (int): Maximum number of packages allowed on the truck.
+            driver (str, optional): Driver's name or identifier. Defaults to ''.
+
+        Raises:
+            ValueError: If the truck_id is not unique or not an integer.
+        """
         # ensure unique id
         if truck_id in Truck._truck_ids:
             raise ValueError(f'Truck with ID {truck_id} already exists.', truck_id)
@@ -120,9 +192,25 @@ class Truck:
         self.total_delivery_time=timedelta(0)
 
     def get_trucks_count(self):
+        """
+        Get the total number of Truck instances created.
+
+        Returns:
+            int: Number of trucks instantiated.
+        """
         return len(Truck._truck_ids)
 
     def deliver_packages(self):
+        """
+        Execute the delivery process for the truck.
+
+        Handles delayed starts if driver is shared, updates package statuses,
+        optimizes delivery route, calculates distances and delivery times,
+        and updates truck status and cumulative statistics.
+
+        Returns:
+            None
+        """
         #delay delivery start time if waiting on a driver
         if re.search(r'Truck',self.driver):
             #get the truck number
@@ -187,6 +275,19 @@ class Truck:
         self.status='at hub'
 
     def get_distance(self,x:int,y:int):
+        """
+        Retrieve the distance between two locations based on indices.
+
+        Args:
+            x (int): Index of the first location.
+            y (int): Index of the second location.
+
+        Returns:
+            float: Distance between the two locations.
+
+        Notes:
+            If distance is not found in the direct order, attempts to retrieve distance in reverse order using recursive call.
+        """
         #look up the distance between to locations
         distance = self.trucks_distance_list[x][y]
 
@@ -197,6 +298,15 @@ class Truck:
             return float(distance)
 
     def validate_packages(self):
+        """
+        Validate that the packages loaded on the truck meet constraints.
+
+        Checks that the number of packages does not exceed the maximum allowed,
+        verifies package assignment to this truck, and updates package delivery statuses.
+
+        Raises:
+            ValueError: If the truck has more packages than allowed or if a package is assigned to a different truck.
+        """
         #check packages against maximum load
         if len(self.packages_not_delivered)>self.package_maximum:
             raise ValueError(f'Truck has more than {self.package_maximum} packages.', len(self.packages_not_delivered))
@@ -217,44 +327,38 @@ class Truck:
                 package.delivery_status = 'at hub'
 
     def optimize_route(self, not_visited_package_list:list):
-        # use nearest neighbor to reorder the packages
+        """
+        Optimize delivery route using nearest neighbor heuristic.
 
-        # order of addresses to be visited, using address index number
-        visited_list = []
-        # start at the hub
-        last_address_node = 0
+        Args:
+            not_visited_package_list (list): List of package IDs to deliver.
 
-        while not_visited_package_list:
-            next_package = None
-            next_remove_index=0
-            shortest_distance = math.inf
+        Returns:
+            list: Optimized list of package IDs for delivery order.
+        """
+        #use the nearest neighbor heuristic to optimize delivery routing
+        route = []
+        current_location = 0
+        not_visited = not_visited_package_list.copy()
 
-            # get most recent address visited
-            at_address = last_address_node
+        while not_visited:
+            # Find the package closest to the current location
+            closest_package = None
+            closest_distance = math.inf
 
-            #check for the closest address to the most recent address
-            for index_remove,package_id in enumerate(not_visited_package_list):
+            for package_id in not_visited:
                 package = self.trucks_package_info_table.get(int(package_id))
-                zip_address = package.get_address()
-                address = self.trucks_address_list.get(zip_address)
-                address = int(address[0])
-                address_distance = self.get_distance(int(at_address), int(address))
-                if address_distance<shortest_distance:
-                    shortest_distance = address_distance
-                    next_package = package_id
-                    next_remove_index = index_remove
-                    last_address_node = address
+                address_key = package.get_address()
+                address_index = int(self.trucks_address_list[address_key][0])
+                distance = self.get_distance(current_location, address_index)
 
-            #save the closest address to the visited set
-            visited_list.append(next_package)
-            not_visited_package_list.pop(next_remove_index)
+                if distance < closest_distance:
+                    closest_distance = distance
+                    closest_package = package_id
 
-        return visited_list
+            # Add the closest package to the route and remove it from not visited
+            route.append(closest_package)
+            current_location = int(self.trucks_address_list[self.trucks_package_info_table.get(int(closest_package)).get_address()][0])
+            not_visited.remove(closest_package)
 
-    @classmethod
-    def get_cumulative_distance(cls):
-        return Truck._trucks_cumulative_distance
-
-    @classmethod
-    def get_total_time(cls):
-        return Truck._trucks_total_time
+        return route
