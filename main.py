@@ -119,6 +119,6 @@ def UTPPS_UI(truck_list,package_info_table):
                 print('Error - Enter a valid menu choice 1-4')
 
 
-
+#run the program
 if __name__ == '__main__':
     run_UTPPS()
