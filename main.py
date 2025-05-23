@@ -62,7 +62,7 @@ def run_UTPPS():
 
 def create_menu():
     #display options to the user in the command line interface
-    print(f'{'---Utah Private Parcel Service(UTPPS)---':^220}')
+    print(f'{'--- Utah Private Parcel Service (UTPPS) ---':^220}')
     print('Delivery Status Options:')
     print('1. View a package status using package id')
     print('2. View status of all packages')
@@ -102,11 +102,16 @@ def UTPPS_UI(truck_list,package_info_table):
                 else:
                     print('Not able to show a summary. Please try again.')
             case '2':
-                Package.package_status_all(package_info_table)
-                # display cumulative all package summary
-                Services.print_line()
-                print(f'Total Packages Delivered: {package_info_table.size}')
-                Services.print_new_section()
+                input_time = read_required_string_as_time('Enter a time of day (eg 8:05 am or 4:30 pm):', True)
+                if input_time:
+                    Package.package_status_all(package_info_table,0,input_time)
+                    # display cumulative all package summary
+                    Services.print_line()
+                    print(f'Total Packages Delivered: {package_info_table.size}')
+                    Services.print_new_section()
+                else:
+                    print('Not able to show a summary. Please try again.')
+
 
             case '3':
                 Truck.total_miles_travelled(truck_list)

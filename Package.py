@@ -131,8 +131,8 @@ class Package:
         #check for address change based on time
         if self.new_address_needed != 'No':
             try:
-                new_address_needed_time = datetime.strptime(self.new_address_needed, '%I:%M %p')
-                if new_address_needed_time > time:
+                new_address_needed_time = Services.convert_str_datetime('',self.new_address_needed)
+                if new_address_needed_time < time:
                     address_at_time = '410 S State St'
                     zip_at_time = '84111'
                 else:
