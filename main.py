@@ -1,6 +1,5 @@
 #Janis Wint Student Number:012214215 WGU C950
 import Hash_Table
-from Services import DataServices
 import Truck
 import Package
 import Services
@@ -39,19 +38,17 @@ def read_required_string_as_time(prompt:str,usingtime:bool=False):
 
 
 def run_UTPPS():
-    # helper utility to read data files, calculate distances and convert datetimes
-    data_service = DataServices()
 
     #at the beginning of the day, setup data
-    package_info_table =Package.open_store_packages(data_service)
-    distance_list = Truck.open_store_distances(data_service)
-    address_list = Truck.open_store_addresses(data_service)
+    package_info_table =Package.open_store_packages()
+    distance_list = Truck.open_store_distances()
+    address_list = Truck.open_store_addresses()
 
     #create the empty trucks
-    truck_list = Truck.open_store_trucks(data_service)
+    truck_list = Truck.open_store_trucks()
 
     #place the packages into the trucks
-    Truck.load_trucks(data_service,truck_list,distance_list,address_list,package_info_table)
+    Truck.load_trucks(truck_list,distance_list,address_list,package_info_table)
 
     #start deliveries
     for truck in truck_list:
@@ -65,7 +62,7 @@ def run_UTPPS():
 
 def create_menu():
     #display options to the user in the command line interface
-    print(f'{'Utah Private Parcel Service (UTPPS)':^220}\n\n')
+    print(f'{'---Utah Private Parcel Service(UTPPS)---':^220}')
     print('Delivery Status Options:')
     print('1. View a package status using package id')
     print('2. View status of all packages')

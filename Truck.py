@@ -1,27 +1,26 @@
 import math
 import Services
 
-from Services import DataServices
+
 import Hash_Table
 import re
 from datetime import datetime, timedelta
 
-def load_trucks(data_service:DataServices,truck_list:list, distance_list:list, address_list:dict, package_info_table:Hash_Table):
+def load_trucks(truck_list:list, distance_list:list, address_list:dict, package_info_table:Hash_Table):
 
     for i, truck in enumerate(truck_list):
         #when loading the first truck, set up the services for all trucks
         if truck.trucks_data_service is None:
-            truck.trucks_data_service=data_service
             truck.trucks_distance_list=distance_list
             truck.trucks_address_list=address_list
             truck.trucks_package_info_table=package_info_table
 
         # get the packages for that truck
-        truck_package_list = data_service.get_config_info('truck_info', 'packages_'+str(i)).split(',')
+        truck_package_list = Services.get_config_info('truck_info', 'packages_'+str(i)).split(',')
         #load onto the truck without optimization
         truck.packages_not_delivered=truck_package_list
         #set the delivery starting time
-        truck.departure_time=Services.convert_str_datetime('',data_service.get_config_info('truck_info', 'start_delivery_'+str(i)))
+        truck.departure_time=Services.convert_str_datetime('',Services.get_config_info('truck_info', 'start_delivery_'+str(i)))
         #check packages against constraints
         truck.validate_packages()
 
@@ -29,16 +28,16 @@ def load_trucks(data_service:DataServices,truck_list:list, distance_list:list, a
 
 
 
-def open_store_trucks(data_service):
+def open_store_trucks():
     truck_list = []
     #read in the truck information from the config file
-    number_of_trucks = data_service.get_config_info('truck_info','trucks_available').strip()
+    number_of_trucks = Services.get_config_info('truck_info','trucks_available').strip()
     if number_of_trucks.isdigit():
         number_of_trucks = int(number_of_trucks)
-    package_max=data_service.get_config_info('truck_info','package_maximum')
+    package_max=Services.get_config_info('truck_info','package_maximum')
     if package_max.isdigit():
         package_max = int(package_max)
-    driver_list = data_service.get_config_info('truck_info','truck_drivers_available').split(',')
+    driver_list = Services.get_config_info('truck_info','truck_drivers_available').split(',')
 
     #check for sufficient number of drivers
     driver_shortage = int(number_of_trucks)-len(driver_list)
@@ -58,14 +57,14 @@ def open_store_trucks(data_service):
 
 
 
-def open_store_distances(data_service:DataServices):
+def open_store_distances():
     # load in distance data from file
-    distance_data = list(data_service.get_data_file('distance_file'))
+    distance_data = list(Services.get_data_file('distance_file'))
     return distance_data
 
-def open_store_addresses(data_service:DataServices):
+def open_store_addresses():
     # load in address data from file
-    address_data_lines = list(data_service.get_data_file('address_file'))
+    address_data_lines = list(Services.get_data_file('address_file'))
 
     # store data using the address|zip as the key in the Python dictionary
     # will use .get method to get position of the address within the distance data list
@@ -78,12 +77,12 @@ def total_miles_travelled(truck_list):
     print(f'{'UTPPS Truck Delivery Summary':^220}')
     Services.print_line()
     for truck in truck_list:
-        print(f'Truck #:{truck.id}{' ':<15}Total Distance: {truck.trip_distance:.2f}{' ':<15}Start Time: {truck.departure_time}{' ':<15}Return Time: {truck.return_time}{' ':<15}Delivery Time: {truck.total_delivery_time}')
+        print(f'Truck #:{truck.id}{' ':<15}Total Distance: {truck.trip_distance:.2g}{' ':<15}Start Time: {truck.departure_time}{' ':<15}Return Time: {truck.return_time}{' ':<15}Delivery Time: {truck.total_delivery_time}')
         Services.print_line()
 
     #display cumulative miles and time
     Services.print_line()
-    print(f'Total Miles Travelled: {truck_list[-1].get_cumulative_distance()}')
+    print(f'Total Miles Travelled: {truck_list[-1].get_cumulative_distance():2g}')
     print(f'Total Delivery Time: {truck_list[-1].get_total_time()}')
     print(f'Last Delivery: {truck_list[-1].return_time}')
     Services.print_new_section()
@@ -112,12 +111,12 @@ class Truck:
         self.driver=driver
         self.status='at hub'
         self.packages_not_delivered =None
-        self.departure_time=timedelta(0)
-        self.return_time=timedelta(0)
+        self.departure_time=None
+        self.return_time=None
         self.trip_distance=0
         self.package_maximum=package_max
         self.route=None
-        self.clock=timedelta(0)
+        self.clock=None
         self.total_delivery_time=timedelta(0)
 
     def get_trucks_count(self):
@@ -161,7 +160,7 @@ class Truck:
             next_stop_list = self.trucks_address_list.get(next_stop_address)
             next_stop= int(next_stop_list[0])
             next_stop_distance = self.get_distance(current_stop, next_stop)
-            next_stop_time = self.trucks_data_service.next_stop_time(self.clock, next_stop_distance)
+            next_stop_time = Services.next_stop_time(self.clock, next_stop_distance)
 
             #update package
             package.delivery_status='delivered'
@@ -178,7 +177,7 @@ class Truck:
 
         #return to hub
         next_stop_distance = self.get_distance(current_stop, 0)
-        next_stop_time = self.trucks_data_service.next_stop_time(self.clock, next_stop_distance)
+        next_stop_time = Services.next_stop_time(self.clock, next_stop_distance)
         self.clock=next_stop_time
 
         self.return_time=next_stop_time
@@ -212,7 +211,7 @@ class Truck:
             else:
                 package.delivery_truck = self.id
 
-            if not package.delayed_delivery_time=='':
+            if package.delayed_delivery_time is not None:
                 package.delivery_status="delayed"
             else:
                 package.delivery_status = 'at hub'

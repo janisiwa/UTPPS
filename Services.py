@@ -34,34 +34,34 @@ def print_line():
 def print_new_section():
     print('\n\n')
 
-class DataServices:
-
-    def get_config_info(self, section: str, info_type: str):
-        config = read_config()
-        return config.get(section, info_type)
-
-    def get_data_file(self, file_type:str):
-        config = read_config()
-        package_file_location = config.get('data_sources', file_type)
-
-        # open the file
-        data = open(package_file_location, encoding='utf-8-sig')
-        csv_reader = csv.reader(data)
-        data_lines = list(csv_reader)
-        return data_lines
 
 
+def get_config_info(section: str, info_type: str):
+    config = read_config()
+    return config.get(section, info_type)
+
+def get_data_file(file_type:str):
+    config = read_config()
+    package_file_location = config.get('data_sources', file_type)
+
+    # open the file
+    data = open(package_file_location, encoding='utf-8-sig')
+    csv_reader = csv.reader(data)
+    data_lines = list(csv_reader)
+    return data_lines
 
 
 
-    def next_stop_time(self,start_time:datetime,distance:float):
-        #retrieve the speed in miles per hour
-        speed = float(DataServices.get_config_info(self,'truck_info','speed_mph').strip())
 
-        #distance/speed = how many hours it takes
-        travel_hours = distance/speed
 
-        #how many minutes it takes
-        travel_minutes = travel_hours*60
+def next_stop_time(start_time:datetime,distance:float):
+    #retrieve the speed in miles per hour
+    speed = float(get_config_info('truck_info','speed_mph').strip())
 
-        return start_time + timedelta(minutes=travel_minutes)
+    #distance/speed = how many hours it takes
+    travel_hours = distance/speed
+
+    #how many minutes it takes
+    travel_minutes = travel_hours*60
+
+    return start_time + timedelta(minutes=travel_minutes)

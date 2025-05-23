@@ -4,19 +4,19 @@ from datetime import datetime, timedelta
 
 import Services
 import Hash_Table
-from Services import DataServices
 
 
 
-def open_store_packages(data_service:DataServices):
+
+def open_store_packages():
     package_info_table = Hash_Table.Hash_Table()
     #load in the package file data
-    package_data = data_service.get_data_file('package_file')
+    package_data = Services.get_data_file('package_file')
 
     # make packages and store in hash table
-    return make_packages(data_service,package_data,package_info_table)
+    return make_packages(package_data,package_info_table)
 
-def make_packages(data_service,data_lines,package_info_table:Hash_Table):
+def make_packages(data_lines,package_info_table:Hash_Table):
         # load in the package components
         for data_line in data_lines:
             # assign the unique id to the new package
