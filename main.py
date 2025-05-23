@@ -7,6 +7,26 @@ import Services
 
 from datetime import datetime, timedelta
 
+def read_required_string_as_time(prompt):
+    #verify the input is not empty
+    input_string = input(prompt)
+    while input_string.strip() =='':
+        print('A value is required.')
+        input_string = input(prompt)
+    # allow user to cancel using a q character
+    if input_string.strip() =='q':
+        return False
+    #very input is a time
+    try:
+        input_time = datetime.strptime(input_string, '%I:%M %p')
+        return input_time
+    except ValueError:
+        print('Incorrect time format.')
+        read_required_string_as_time('Enter a time of day (eg 8:05 am or 4:30 pm):')
+        return False
+
+
+
 
 def run_UTPPS():
     # helper utility to read data files, calculate distances and convert datetimes
@@ -57,28 +77,30 @@ def exit_program():
 def UTPPS_UI(truck_list,package_info_table):
 
 
-    menu_choice = ""
-    while menu_choice != "4":
+    menu_choice = ''
+    while menu_choice != '4':
         create_menu()
-        menu_choice = input("").strip()
+        menu_choice = input('').strip()
 
         match menu_choice.strip():
-            case "1":
-                Package.package_status_all(package_info_table,2)
-                Services.print_new_section()
-            case "2":
+            case '1':
+                input_time = read_required_string_as_time('Enter a time of day (eg 8:05 am or 4:30 pm):')
+                if input_time:
+                    Package.package_status_all(package_info_table,2, input_time)
+                    Services.print_new_section()
+            case '2':
                 Package.package_status_all(package_info_table)
                 # display cumulative all package summary
                 Services.print_line()
                 print(f'Total Packages Delivered: {package_info_table.size}')
                 Services.print_new_section()
 
-            case "3":
+            case '3':
                 truck_list[-1].total_miles_travelled(truck_list)
-            case "4":
+            case '4':
                 exit_program()
             case _:
-                print("Error - Enter a valid menu choice 1-4")
+                print('Error - Enter a valid menu choice 1-4')
 
 
 
