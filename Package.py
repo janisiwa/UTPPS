@@ -35,10 +35,18 @@ def make_packages(data_service,data_lines,package_info_table:Hash_Table):
                 if deadline_time =='EOD':
                     deadline_time='6:00 PM'
 
-                new_package.delivery_deadline =  data_service.convert_str_datetime(deadline_date,deadline_time)
+                new_package.delivery_deadline =  Services.convert_str_datetime(deadline_date,deadline_time)
                 new_package.weight_kg = data_line[6]
                 new_package.special_notes = data_line[7]
-                new_package.delayed_delivery_time = data_line[8]
+                package_delay = data_line[8]
+                if package_delay != '':
+                    try:
+                        file_delay_time = Services.convert_str_datetime('',package_delay)
+                    except ValueError:
+                        file_delay_time = None
+                else:
+                    file_delay_time=None
+                new_package.delayed_delivery_time = file_delay_time
                 delivery_truck = data_line[9]
                 if delivery_truck.isdigit():
                     new_package.delivery_truck = int(data_line[9])
@@ -104,7 +112,7 @@ class Package:
         self.delivery_deadline = ''
         self.weight_kg = ''
         self.special_notes = ''
-        self.delayed_delivery_time = ''
+        self.delayed_delivery_time = None
         self.delivery_truck = ''
         self.co_delivery = ''
         self.new_address_needed = ''
@@ -118,11 +126,45 @@ class Package:
         return address_zip
 
     def print_status(self, time:datetime):
-        status_at_time='delivered'
-        address_at_time='410'
-        zip_at_time = '33333'
-        delivery_endtime_at_time = timedelta(0)
+        #use the time to retrieve the correct package status information
 
-        return f'Package: {self.id} Weight: {self.weight_kg}kg Delivery Address: {address_at_time} {self.city}, {self.state} {zip_at_time}\nTruck #:{self.delivery_truck} Delivery Status: {status_at_time} {delivery_endtime_at_time}'
+        #check for address change based on time
+        if self.new_address_needed != 'No':
+            try:
+                new_address_needed_time = datetime.strptime(self.new_address_needed, '%I:%M %p')
+                if new_address_needed_time > time:
+                    address_at_time = '410 S State St'
+                    zip_at_time = '84111'
+                else:
+                    address_at_time = self.street_address
+                    zip_at_time = self.zip_code
+            except ValueError:
+                new_address_needed_time=None
+                address_at_time = self.street_address
+                zip_at_time = self.zip_code
+        else:
+            address_at_time = self.street_address
+            zip_at_time = self.zip_code
+
+        #get delivery info based on time
+        if self.delivery_end_datetime < time:
+            status_at_time='delivered'
+            delivery_endtime_at_time = self.delivery_end_datetime
+            truck_at_time = f'Truck #:{self.delivery_truck}'
+        elif self.delivery_end_datetime > time > self.delivery_start_datetime:
+            status_at_time='En route'
+            delivery_endtime_at_time = ''
+            truck_at_time = f'Truck #:{self.delivery_truck}'
+        elif self.delayed_delivery_time is not None and self.delayed_delivery_time > time:
+            status_at_time=f'Delayed - expected to arrive at hub {self.delayed_delivery_time}'
+            delivery_endtime_at_time = ''
+            truck_at_time = ''
+        else:
+            status_at_time='at hub'
+            delivery_endtime_at_time = ''
+            truck_at_time = ''
+
+
+        return f'Package: {self.id} Weight: {self.weight_kg}kg Delivery Address: {address_at_time} {self.city}, {self.state} {zip_at_time}\nDelivery Status at {time}: {status_at_time} {delivery_endtime_at_time} {truck_at_time}'
     def __str__(self):
         return f'Package: {self.id} Weight: {self.weight_kg}kg Delivery Address: {self.street_address} {self.city}, {self.state} {self.zip_code}\nTruck #:{self.delivery_truck} Delivery Status: {self.delivery_status} {self.delivery_end_datetime}'

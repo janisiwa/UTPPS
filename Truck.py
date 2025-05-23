@@ -21,7 +21,7 @@ def load_trucks(data_service:DataServices,truck_list:list, distance_list:list, a
         #load onto the truck without optimization
         truck.packages_not_delivered=truck_package_list
         #set the delivery starting time
-        truck.departure_time=data_service.convert_str_datetime('',data_service.get_config_info('truck_info', 'start_delivery_'+str(i)))
+        truck.departure_time=Services.convert_str_datetime('',data_service.get_config_info('truck_info', 'start_delivery_'+str(i)))
         #check packages against constraints
         truck.validate_packages()
 
@@ -144,7 +144,7 @@ class Truck:
             package.delivery_start_datetime=self.departure_time
 
             if package.new_address_needed=='Yes':
-                if self.clock > self.trucks_data_service.convert_str_datetime('', '10:20 AM'):
+                if self.clock > Services.convert_str_datetime('', '10:20 AM'):
                     #update address on package
                     package.street_address='410 S State St'
                     package.zip_code='84111'

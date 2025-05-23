@@ -7,7 +7,7 @@ import Services
 
 from datetime import datetime, timedelta
 
-def read_required_string_as_time(prompt):
+def read_required_string_as_time(prompt:str,usingtime:bool=False):
     #verify the input is not empty
     input_string = input(prompt)
     while input_string.strip() =='':
@@ -16,15 +16,25 @@ def read_required_string_as_time(prompt):
     # allow user to cancel using a q character
     if input_string.strip() =='q':
         return False
-    #very input is a time
-    try:
-        input_time = datetime.strptime(input_string, '%I:%M %p')
-        return input_time
-    except ValueError:
-        print('Incorrect time format.')
-        read_required_string_as_time('Enter a time of day (eg 8:05 am or 4:30 pm):')
-        return False
 
+    if usingtime:
+        #very input is a time
+        try:
+            input_time = Services.convert_str_datetime('',input_string)
+            return input_time
+        except ValueError:
+            print('Incorrect time format.')
+            read_required_string_as_time('Enter a time of day (eg 8:05 am or 4:30 pm):')
+            return False
+    else:
+        #verify package ID is an integer
+        try:
+            int_input = int(input_string)
+            return int_input
+        except ValueError:
+            print('Incorrect format. Enter an integer for a package ID')
+            read_required_string_as_time('Enter a package ID (eg 23):')
+            return False
 
 
 
@@ -84,10 +94,16 @@ def UTPPS_UI(truck_list,package_info_table):
 
         match menu_choice.strip():
             case '1':
-                input_time = read_required_string_as_time('Enter a time of day (eg 8:05 am or 4:30 pm):')
+                input_time = read_required_string_as_time('Enter a time of day (eg 8:05 am or 4:30 pm):',True)
                 if input_time:
-                    Package.package_status_all(package_info_table,2, input_time)
-                    Services.print_new_section()
+                    input_id = read_required_string_as_time('Enter a package ID (eg 23):', False)
+                    if input_id:
+                        Package.package_status_all(package_info_table,input_id, input_time)
+                        Services.print_new_section()
+                    else:
+                        print('Not able to show a summary. Please try again.')
+                else:
+                    print('Not able to show a summary. Please try again.')
             case '2':
                 Package.package_status_all(package_info_table)
                 # display cumulative all package summary
@@ -96,7 +112,7 @@ def UTPPS_UI(truck_list,package_info_table):
                 Services.print_new_section()
 
             case '3':
-                truck_list[-1].total_miles_travelled(truck_list)
+                Truck.total_miles_travelled(truck_list)
             case '4':
                 exit_program()
             case _:

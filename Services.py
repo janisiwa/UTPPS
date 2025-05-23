@@ -7,6 +7,19 @@ from tracemalloc import take_snapshot
 from datetime import datetime,date,timedelta
 
 
+def convert_str_datetime(str_date: str = '', str_time: str = ''):
+    # if date not provided, use today's date
+    if str_date == '':
+        today = date.today()
+        str_date = f'{today.month}-{today.day}-{today.strftime('%Y')}'
+
+    # if time not provided, use 12 am
+    if str_time == '':
+        str_time = '12:00 AM'
+
+    str_datetime = f'{str_date} {str_time}'
+    return datetime.strptime(str_datetime, '%m-%d-%Y %I:%M %p')
+
 def read_config():
     # get package data file location from application config file
     config = configparser.ConfigParser()
@@ -39,18 +52,7 @@ class DataServices:
 
 
 
-    def convert_str_datetime(self,str_date:str='',str_time:str=''):
-        #if date not provided, use today's date
-        if str_date=='':
-            today = date.today()
-            str_date= f'{today.month}-{today.day}-{today.strftime('%Y')}'
 
-        #if time not provided, use 12 am
-        if str_time == '':
-            str_time= '12:00 AM'
-
-        str_datetime = f'{str_date} {str_time}'
-        return datetime.strptime(str_datetime, '%m-%d-%Y %I:%M %p')
 
     def next_stop_time(self,start_time:datetime,distance:float):
         #retrieve the speed in miles per hour
