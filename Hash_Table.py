@@ -16,7 +16,10 @@ class Hash_Table:
 
     def _get_hash(self, key):
         #hash function for future use if decided to no longer direct address
-        return key % self.capacity
+        if key>self.capacity:
+            return None
+        else:
+            return key % self.capacity
 
     #insert function using package ID - Requirement A
     def add(self,key,value):
@@ -89,7 +92,7 @@ class Hash_Table:
         # hash based on the input key
         key_hash = self._get_hash(key)
 
-        if self.map[key_hash] is None:
+        if key_hash is None or self.map[key_hash] is None:
             # there are no existing keys in that index
             return None
         else:

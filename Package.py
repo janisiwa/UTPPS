@@ -76,7 +76,7 @@ def get_package(package_info_table:Hash_Table,package_id:int):
 
 def package_status_all(package_info_table:Hash_Table, package_id=0, time:datetime=timedelta(0)):
     Services.print_line()
-    package_list=[]
+    package_list=None
 
     #get all packages
     if package_id==0:
@@ -88,6 +88,11 @@ def package_status_all(package_info_table:Hash_Table, package_id=0, time:datetim
         summary_title = f'UTPPS Package Delivery Summary for Package ID {package_id} at {time.strftime('%m-%d-%Y %I:%M %p')}'
         print(f'{summary_title:^220}')
         package_list = [package_info_table.get(package_id)]
+
+    #if there is no package with that ID
+    if package_list == [None]:
+        print(f'No packages were found with package ID {package_id}.')
+
 
     #print package info
     delivered_count=0
