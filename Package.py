@@ -9,6 +9,7 @@ import Hash_Table
 
 
 def open_store_packages():
+    #use custom hash_table - Requirement A
     package_info_table = Hash_Table.Hash_Table()
     #load in the package file data
     package_data = Services.get_data_file('package_file')
@@ -53,7 +54,7 @@ def make_packages(data_lines,package_info_table:Hash_Table):
                 new_package.co_delivery = data_line[10]
                 new_package.new_address_needed = data_line[11]
 
-                # add pacakge to package info table
+                # add pacakge to package info table, using my hash_table class
                 package_info_table.add(new_package.id, new_package)
 
 
@@ -64,6 +65,7 @@ def make_packages(data_lines,package_info_table:Hash_Table):
 
 #lookup function (by package id) to return package components
 def get_package(package_info_table:Hash_Table,package_id:int):
+    #use look-up function - Requirement B
     found_package=package_info_table.get(package_id)
     if found_package is None:
         return None
@@ -74,7 +76,7 @@ def get_package(package_info_table:Hash_Table,package_id:int):
 
 def package_status_all(package_info_table:Hash_Table, package_id=0, time:datetime=timedelta(0)):
     Services.print_line()
-    package_list=None
+    package_list=[]
 
     #get all packages
     if package_id==0:
@@ -89,7 +91,7 @@ def package_status_all(package_info_table:Hash_Table, package_id=0, time:datetim
 
     #print package info
     delivered_count=0
-    for package_count, package in enumerate(package_list):
+    for package_count, package in enumerate(sorted(package_list, key=lambda package: package.delivery_truck)):
 
         #print the status for each package based on the time
         Services.print_line()

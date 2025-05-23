@@ -1,4 +1,4 @@
-#Janis Wint Student Number:012214215 WGU C950
+#Janis Wint -- Student Number:012214215 -- WGU C950 -- Task II
 import Hash_Table
 import Truck
 import Package

@@ -18,7 +18,7 @@ class Hash_Table:
         #hash function for future use if decided to no longer direct address
         return key % self.capacity
 
-    #insert function
+    #insert function using package ID - Requirement A
     def add(self,key,value):
         # check for load capacity
         if self.size / self.capacity > 0.70:
@@ -84,6 +84,7 @@ class Hash_Table:
             self.map[key_hash]=None
             return True
 
+    #look-up function using package ID to return package - Requirement B
     def get(self,key):
         # hash based on the input key
         key_hash = self._get_hash(key)
