@@ -326,6 +326,7 @@ class Truck:
             else:
                 package.delivery_status = 'at hub'
 
+
     def optimize_route(self, not_visited_package_list:list):
         """
         Optimize delivery route using nearest neighbor heuristic.
@@ -362,3 +363,23 @@ class Truck:
             not_visited.remove(closest_package)
 
         return route
+
+    @classmethod
+    def get_cumulative_distance(cls):
+        """
+        Returns the total cumulative distance traveled by all trucks.
+
+        Returns:
+            float: The cumulative distance traveled by all trucks.
+        """
+        return Truck._trucks_cumulative_distance
+
+    @classmethod
+    def get_total_time(cls):
+        """
+        Returns the total delivery time accumulated by all trucks.
+
+        Returns:
+            datetime.timedelta: The total delivery time for all trucks.
+        """
+        return Truck._trucks_total_time

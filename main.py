@@ -91,7 +91,7 @@ def create_menu():
 
 
 def exit_program():
-    """Prints a message indicating the program is exiting."""
+    """Prints a message indicating the program is exiting. Last execution before the program ends."""
     Services.print_line()
     print('Exiting the UTPPS System! Bye!')
     Services.print_line()
