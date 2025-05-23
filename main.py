@@ -9,31 +9,29 @@ from datetime import datetime, timedelta
 def read_required_string_as_time(prompt:str,usingtime:bool=False):
     #verify the input is not empty
     input_string = input(prompt)
-    while input_string.strip() =='':
+    if input_string.strip() =='':
         print('A value is required.')
-        input_string = input(prompt)
+        return read_required_string_as_time(prompt, usingtime)
+
     # allow user to cancel using a q character
-    if input_string.strip() =='q':
+    if input_string.strip().lower() =='q':
         return False
 
     if usingtime:
         #very input is a time
         try:
-            input_time = Services.convert_str_datetime('',input_string)
-            return input_time
+            return Services.convert_str_datetime('',input_string)
+
         except ValueError:
-            print('Incorrect time format.')
-            read_required_string_as_time('Enter a time of day (eg 8:05 am or 4:30 pm):')
-            return False
+            return read_required_string_as_time('Incorrect time format. Enter a time of day (eg 8:05 am or 4:30 pm):',True)
     else:
         #verify package ID is an integer
         try:
-            int_input = int(input_string)
-            return int_input
+            return int(input_string)
+
         except ValueError:
-            print('Incorrect format. Enter an integer for a package ID')
-            read_required_string_as_time('Enter a package ID (eg 23):')
-            return False
+            return read_required_string_as_time('Incorrect id format. Enter a package ID (eg 23):',False)
+
 
 
 
@@ -104,10 +102,10 @@ def UTPPS_UI(truck_list,package_info_table):
             case '2':
                 input_time = read_required_string_as_time('Enter a time of day (eg 8:05 am or 4:30 pm):', True)
                 if input_time:
-                    Package.package_status_all(package_info_table,0,input_time)
+                    delivered_count, total_count=Package.package_status_all(package_info_table,0,input_time)
                     # display cumulative all package summary
                     Services.print_line()
-                    print(f'Total Packages Delivered: {package_info_table.size}')
+                    print(f'Delivered Packages: {delivered_count} Total Packages: {total_count}')
                     Services.print_new_section()
                 else:
                     print('Not able to show a summary. Please try again.')

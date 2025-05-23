@@ -77,14 +77,14 @@ def total_miles_travelled(truck_list):
     print(f'{'UTPPS Truck Delivery Summary':^220}')
     Services.print_line()
     for truck in truck_list:
-        print(f'Truck #:{truck.id}{' ':<15}Total Distance: {truck.trip_distance:.2g}{' ':<15}Start Time: {truck.departure_time}{' ':<15}Return Time: {truck.return_time}{' ':<15}Delivery Time: {truck.total_delivery_time}')
+        print(f'Truck #:{truck.id}{' ':<15}Total Distance: {truck.trip_distance:.2g} mi{' ':<15}Start Time: {truck.departure_time.strftime('%m-%d-%Y %I:%M %p')}{' ':<15}Return Time: {truck.return_time.strftime('%m-%d-%Y %I:%M %p')}{' ':<15}Delivery Duration: {truck.total_delivery_time}')
         Services.print_line()
 
     #display cumulative miles and time
     Services.print_line()
-    print(f'Total Miles Travelled: {truck_list[-1].get_cumulative_distance():2g}')
+    print(f'Total Miles Travelled: {truck_list[-1].get_cumulative_distance():2g} mi')
     print(f'Total Delivery Time: {truck_list[-1].get_total_time()}')
-    print(f'Last Delivery: {truck_list[-1].return_time}')
+    print(f'Last Delivery: {truck_list[-1].return_time.strftime('%m-%d-%Y %I:%M %p')}')
     Services.print_new_section()
 
 class Truck:
@@ -109,7 +109,7 @@ class Truck:
         self.id = truck_id
         Truck._truck_ids.setdefault(int(truck_id), None)
         self.driver=driver
-        self.status='at hub'
+        self.status='At hub'
         self.packages_not_delivered =None
         self.departure_time=None
         self.return_time=None

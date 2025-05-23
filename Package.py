@@ -78,19 +78,28 @@ def package_status_all(package_info_table:Hash_Table, package_id=0, time:datetim
 
     #get all packages
     if package_id==0:
-        print(f'{'UTPPS Package Delivery Summary - All Packages':^220}')
+        summary_title = f'UTPPS Package Delivery Summary - All Packages at {time.strftime('%m-%d-%Y %I:%M %p')}'
+        print(f'{summary_title:^220}')
         package_list=package_info_table.get_all()
     #get a specific package
     else:
-        summary_title = f'UTPPS Package Delivery Summary for Package ID {package_id}'
+        summary_title = f'UTPPS Package Delivery Summary for Package ID {package_id} at {time.strftime('%m-%d-%Y %I:%M %p')}'
         print(f'{summary_title:^220}')
         package_list = [package_info_table.get(package_id)]
 
-    for package in package_list:
+    #print package info
+    delivered_count=0
+    for package_count, package in enumerate(package_list):
+
+        #print the status for each package based on the time
         Services.print_line()
         print(package.print_status(time))
+        # track the number of packages that are delivered at the time
+        if package.timed_status == 'Delivered':
+            delivered_count += 1
         Services.print_line()
-
+    #return number of packages delivered out of total packages at the time
+    return delivered_count,package_count+1
 
 
 class Package:
@@ -120,6 +129,7 @@ class Package:
         self.delivery_end_datetime=None
         self.delivery_start_datetime = None
         self.delivery_deadline=None
+        self.timed_status=''
 
     def get_address(self):
         address_zip=f'{self.street_address}|{self.zip_code}'
@@ -147,24 +157,30 @@ class Package:
             zip_at_time = self.zip_code
 
         #get delivery info based on time
-        if self.delivery_end_datetime < time:
-            status_at_time='delivered'
-            delivery_endtime_at_time = self.delivery_end_datetime
-            truck_at_time = f'Truck #:{self.delivery_truck}'
+        if self.delivery_end_datetime <= time:
+            status_at_time='Delivered'
+            delivery_endtime_at_time = self.delivery_end_datetime.strftime('%m-%d-%Y %I:%M %p')
+            truck_at_time = f'Truck #{self.delivery_truck}'
         elif self.delivery_end_datetime > time > self.delivery_start_datetime:
             status_at_time='En route'
             delivery_endtime_at_time = ''
-            truck_at_time = f'Truck #:{self.delivery_truck}'
+            truck_at_time = f'Truck #{self.delivery_truck}'
         elif self.delayed_delivery_time is not None and self.delayed_delivery_time > time:
             status_at_time=f'Delayed - expected to arrive at hub {self.delayed_delivery_time}'
             delivery_endtime_at_time = ''
             truck_at_time = ''
         else:
-            status_at_time='at hub'
+            status_at_time='At hub'
             delivery_endtime_at_time = ''
             truck_at_time = ''
 
+        #temporarily store status at that time
+        self.timed_status = status_at_time
+        display_address=f'Delivery Address: {address_at_time} {self.city}, {self.state} {zip_at_time}'
+        display_delivery_status=f'Delivery Status: {status_at_time} {delivery_endtime_at_time}'
+        return f'Package ID: {self.id:<15}{display_address:<90}{display_delivery_status:<50}{truck_at_time}'
 
-        return f'Package: {self.id} Weight: {self.weight_kg}kg Delivery Address: {address_at_time} {self.city}, {self.state} {zip_at_time}\nDelivery Status at {time}: {status_at_time} {delivery_endtime_at_time} {truck_at_time}'
     def __str__(self):
-        return f'Package: {self.id} Weight: {self.weight_kg}kg Delivery Address: {self.street_address} {self.city}, {self.state} {self.zip_code}\nTruck #:{self.delivery_truck} Delivery Status: {self.delivery_status} {self.delivery_end_datetime}'
+        display_address = f'Delivery Address: {self.street_address} {self.city}, {self.state} {self.zip_code}'
+        display_delivery_status = f'Delivery Status: {self.delivery_status} {self.delivery_end_datetime.strftime('%m-%d-%Y %I:%M %p')}'
+        return f'Package ID: {self.id:<15}{display_address:<90}{display_delivery_status:<50}Assigned Truck #{self.delivery_truck} '
