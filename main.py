@@ -82,7 +82,7 @@ def create_menu():
     print('Delivery Status Options:')
     print('1. View a package status using package id')
     print('2. View status of all packages')
-    print('3. View total miles travelled for all trucks')
+    print('3. View end of day summary with total miles travelled for all trucks')
     print('4. Exit')
     print('Select [1-4]: ')
 
@@ -133,6 +133,13 @@ def UTPPS_UI(truck_list, package_info_table):
 
 
             case '3':
+                #display end of day summary
+                end_of_day = Services.convert_str_datetime('','5:00 pm')
+                delivered_count, total_count = Package.package_status_all(package_info_table, 0, end_of_day)
+                # display cumulative all package summary
+                Services.print_line()
+                print(f'Delivered Packages: {delivered_count} Total Packages: {total_count}')
+                Services.print_new_section()
                 Truck.total_miles_travelled(truck_list)
             case '4':
                 exit_program()
