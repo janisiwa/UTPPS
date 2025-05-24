@@ -81,7 +81,7 @@ def make_packages(data_lines, package_info_table: Hash_Table):
     return package_info_table
 
 
-#lookup function (by package id) to return package components
+#lookup function (by package id) to return package components - Requirement B
 def get_package(package_info_table: Hash_Table, package_id: int):
     """
     Retrieve a Package object from the Hash_Table by package ID.
