@@ -45,7 +45,7 @@ def read_config():
 
 def print_line():
     """Print a decorative horizontal line for UI spacing."""
-    print('-' * 220)
+    print('-' * 235)
 
 
 def print_new_section():
