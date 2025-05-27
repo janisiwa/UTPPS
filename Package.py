@@ -255,7 +255,9 @@ class Package:
 
         #display package weight and delivery deadline
         weight = f'Weight: {self.weight_kg} kg'
-        deadline = f'Delivery Deadline: (EOD) {self.delivery_deadline.strftime("%m-%d-%Y %I:%M %p") if self.end_of_day else self.delivery_deadline.strftime("%m-%d-%Y %I:%M %p")}'
+        deadline_eod=f'Delivery Deadline: (EOD) {self.delivery_deadline.strftime("%m-%d-%Y %I:%M %p")}'
+        deadline_timed =f'Delivery Deadline: {self.delivery_deadline.strftime("%m-%d-%Y %I:%M %p")}'
+        deadline = f'{deadline_eod if self.end_of_day else deadline_timed}'
         return f'Package ID: {self.id:<5}{weight:<15}{display_address:<90}{deadline:<50}{display_delivery_status:<50}{truck_at_time}'
 
     def __str__(self):
@@ -269,6 +271,8 @@ class Package:
         display_delivery_status = f'Delivery Status: {self.delivery_status} {self.delivery_end_datetime.strftime("%m-%d-%Y %I:%M %p")}'
         # display package weight and delivery deadline
         weight = f'Weight: {self.weight_kg} kg'
-        deadline = f'Delivery Deadline: {self.delivery_deadline.strftime("%m-%d-%Y %I:%M %p")}'
+        deadline_eod = f'Delivery Deadline: (EOD) {self.delivery_deadline.strftime("%m-%d-%Y %I:%M %p")}'
+        deadline_timed = f'Delivery Deadline: {self.delivery_deadline.strftime("%m-%d-%Y %I:%M %p")}'
+        deadline = f'{deadline_eod if self.end_of_day else deadline_timed}'
         return f'Package ID: {self.id:<15}{weight:<20}{display_address:<90}{deadline:<50}{display_delivery_status:<50}Assigned Truck #{self.delivery_truck}'
 
