@@ -52,7 +52,7 @@ def make_packages(data_lines, package_info_table: Hash_Table):
             deadline_time=data_line[5].strip()
             if deadline_time =='EOD':
                 deadline_time='6:00 PM'
-
+                new_package.end_of_day=True
             new_package.delivery_deadline =  Services.convert_str_datetime(deadline_date,deadline_time)
             new_package.weight_kg = data_line[6]
             new_package.special_notes = data_line[7]
@@ -188,6 +188,7 @@ class Package:
         self.delivery_start_datetime = None
         self.delivery_deadline = None
         self.timed_status = ''
+        self.end_of_day=False
 
     def get_address(self):
         """
@@ -251,7 +252,11 @@ class Package:
         self.timed_status = status_at_time
         display_address = f'Delivery Address: {address_at_time} {self.city}, {self.state} {zip_at_time}'
         display_delivery_status = f'Delivery Status: {status_at_time} {delivery_endtime_at_time}'
-        return f'Package ID: {self.id:<15}{display_address:<90}{display_delivery_status:<50}{truck_at_time}'
+
+        #display package weight and delivery deadline
+        weight = f'Weight: {self.weight_kg} kg'
+        deadline = f'Delivery Deadline: (EOD) {self.delivery_deadline.strftime("%m-%d-%Y %I:%M %p") if self.end_of_day else self.delivery_deadline.strftime("%m-%d-%Y %I:%M %p")}'
+        return f'Package ID: {self.id:<5}{weight:<15}{display_address:<90}{deadline:<50}{display_delivery_status:<50}{truck_at_time}'
 
     def __str__(self):
         """
@@ -262,4 +267,8 @@ class Package:
         """
         display_address = f'Delivery Address: {self.street_address} {self.city}, {self.state} {self.zip_code}'
         display_delivery_status = f'Delivery Status: {self.delivery_status} {self.delivery_end_datetime.strftime("%m-%d-%Y %I:%M %p")}'
-        return f'Package ID: {self.id:<15}{display_address:<90}{display_delivery_status:<50}Assigned Truck #{self.delivery_truck} '
+        # display package weight and delivery deadline
+        weight = f'Weight: {self.weight_kg} kg'
+        deadline = f'Delivery Deadline: {self.delivery_deadline.strftime("%m-%d-%Y %I:%M %p")}'
+        return f'Package ID: {self.id:<15}{weight:<20}{display_address:<90}{deadline:<50}{display_delivery_status:<50}Assigned Truck #{self.delivery_truck}'
+
